@@ -19,29 +19,49 @@ object GeminiApiHelper {
         .readTimeout(20, TimeUnit.SECONDS)
         .build()
 
-    // Key can come from BuildConfig or user entered in Settings
+    // Optional user override from in-app Settings
     var customApiKey: String? = null
 
+    /**
+     * Resolves the active Gemini API key securely.
+     * Prefers custom in-app key if configured, otherwise falls back to BuildConfig.GEMINI_API_KEY.
+     */
     fun getEffectiveKey(): String {
         if (!customApiKey.isNullOrBlank()) {
-            return customApiKey!!
+            return customApiKey!!.trim()
         }
         return try {
-            val field = BuildConfig::class.java.getField("GEMINI_API_KEY")
-            (field.get(null) as? String).orEmpty()
+            val key = BuildConfig.GEMINI_API_KEY
+            if (key.isNullOrBlank() || key == "MY_GEMINI_API_KEY") "" else key.trim()
         } catch (e: Throwable) {
             ""
         }
     }
 
-    suspend fun generateResponse(prompt: String, model: String = "gemini-3.5-flash"): String = withContext(Dispatchers.IO) {
+    /**
+     * Checks if a valid API key is present without exposing the actual key contents.
+     */
+    fun hasValidApiKey(): Boolean {
+        val key = getEffectiveKey()
+        return key.isNotBlank() && key != "MY_GEMINI_API_KEY"
+    }
+
+    suspend fun generateResponse(prompt: String, model: String = "gemini-2.5-flash"): String = withContext(Dispatchers.IO) {
         val apiKey = getEffectiveKey()
-        if (apiKey.isBlank() || apiKey == "MY_GEMINI_API_KEY") {
+        if (apiKey.isBlank()) {
             return@withContext generateNeuralFallback(prompt)
         }
 
+        // Normalize model string to official endpoint
+        val normalizedModel = when {
+            model.contains("flash", ignoreCase = true) -> "gemini-2.5-flash"
+            model.contains("pro", ignoreCase = true) -> "gemini-2.5-pro"
+            else -> "gemini-2.5-flash"
+        }
+
         try {
-            val url = "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey"
+            // Keep API key out of URL query parameters; pass via x-goog-api-key header
+            val url = "https://generativelanguage.googleapis.com/v1beta/models/$normalizedModel:generateContent"
             val jsonBody = JSONObject().apply {
                 val contents = JSONArray().apply {
                     val contentObj = JSONObject().apply {
@@ -57,6 +77,8 @@ object GeminiApiHelper {
 
             val request = Request.Builder()
                 .url(url)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("x-goog-api-key", apiKey)
                 .post(jsonBody.toString().toRequestBody("application/json".toMediaType()))
                 .build()
 
@@ -64,7 +86,8 @@ object GeminiApiHelper {
             val responseBody = response.body?.string().orEmpty()
 
             if (!response.isSuccessful) {
-                Log.w(TAG, "Gemini API returned code ${response.code}: $responseBody")
+                // Log status code only — do not print responseBody if it might mirror credentials
+                Log.w(TAG, "Gemini API request completed with HTTP status: ${response.code}")
                 return@withContext generateNeuralFallback(prompt)
             }
 
@@ -84,7 +107,8 @@ object GeminiApiHelper {
 
             generateNeuralFallback(prompt)
         } catch (e: Exception) {
-            Log.e(TAG, "Error querying Gemini API", e)
+            // Log generic error message without exposing tokens
+            Log.e(TAG, "Failed to query Gemini API safely: ${e.javaClass.simpleName}")
             generateNeuralFallback(prompt)
         }
     }

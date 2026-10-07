@@ -13,3 +13,5 @@ build/
 debug.keystore
 debug.keystore.base64
 .env
+.env.local
+*.env
