@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Lumina AI - Web Preview</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Fonts: Orbitron & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- React 18 & Babel Standalone for in-browser JSX parsing -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      background-color: #0A1930;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="bg-[#0A1930] text-white">
+  <div id="root">
+    <!-- Immediate placeholder matching dark blue (#0A1930) theme -->
+    <div style="width:100%;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0A1930;color:#00f2fe;">
+      <div style="width:80px;height:80px;border-radius:18px;border:2px solid #00f2fe;display:flex;align-items:center;justify-content:center;background:rgba(0,242,254,0.1);margin-bottom:14px;box-shadow:0 0 20px rgba(0,242,254,0.3);overflow:hidden;">
+        <img src="logo.png" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';">
+      </div>
+      <div style="font-size:18px;font-weight:900;letter-spacing:2px;">LUMINA AI</div>
+      <div style="font-size:10px;color:#8b949e;margin-top:4px;">LOADING PREVIEW...</div>
+    </div>
+  </div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    function App() {
+      const [isLoggedIn, setIsLoggedIn] = useState(false);
+      const [currentModule, setCurrentModule] = useState('DASHBOARD');
+      const [coins, setCoins] = useState(50.0);
+      const [adsWatched, setAdsWatched] = useState(0);
+      const [isStoreOpen, setIsStoreOpen] = useState(false);
+      const [isAdPlaying, setIsAdPlaying] = useState(false);
+      const [adCountdown, setAdCountdown] = useState(5);
+      const [toastMessage, setToastMessage] = useState(null);
+
+      // Movie Maker state
+      const [movieScript, setMovieScript] = useState("A high-octane cyberpunk space armada battle over the neon rings of Saturn, culminating in an emotional reunion.");
+      const [movieDuration, setMovieDuration] = useState(15);
+      const [movieBgm, setMovieBgm] = useState("Cinematic Action BGM");
+      const [isMovieGenerating, setIsMovieGenerating] = useState(false);
+      const [movieProgress, setMovieProgress] = useState(0);
+
+      // Chat state
+      const [chatMessages, setChatMessages] = useState([
+        { id: 1, isUser: false, text: "Neural Node initialized. Welcome to LUMINA AI Movie Maker Core. How can I assist your cinematic operations today?" }
+      ]);
+      const [chatInput, setChatInput] = useState("");
+      const [isChatLoading, setIsChatLoading] = useState(false);
+
+      // Media Gen state
+      const [mediaPrompt, setMediaPrompt] = useState("Futuristic cyber motorcycle racing through holographic tunnel");
+
+      const showToast = (msg) => {
+        setToastMessage(msg);
+        setTimeout(() => setToastMessage(null), 3000);
+      };
+
+      const handleLogin = (isGuest = false) => {
+        setIsLoggedIn(true);
+        setCurrentModule('DASHBOARD');
+        showToast(isGuest ? "Welcome, Guest Operative!" : "Logged in with Gmail successfully!");
+      };
+
+      const handleLogout = () => {
+        setIsLoggedIn(false);
+        setCurrentModule('DASHBOARD');
+        showToast("Logged out successfully.");
+      };
+
+      const watchAd = () => {
+        if (adsWatched >= 3) {
+          showToast("Daily Free Ads Limit Reached (3 Ads). Please Buy Package!");
+          setIsStoreOpen(true);
+          return;
+        }
+        setIsAdPlaying(true);
+        setAdCountdown(5);
+        const interval = setInterval(() => {
+          setAdCountdown(prev => {
+            if (prev <= 1) {
+              clearInterval(interval);
+              setIsAdPlaying(false);
+              setCoins(c => c + 1.0);
+              setAdsWatched(a => a + 1);
+              showToast("+1.0 Coin Added to Wallet!");
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      };
+
+      const buildMovie = () => {
+        if (!movieScript.trim()) {
+          showToast("Please enter a storyline script!");
+          return;
+        }
+        const cost = movieDuration === 1 ? 2 : movieDuration === 5 ? 5 : movieDuration === 15 ? 10 : 25;
+        if (coins < cost) {
+          showToast(`Insufficient Coins! Requires ${cost} Coins.`);
+          setIsStoreOpen(true);
+          return;
+        }
+        setCoins(c => c - cost);
+        setIsMovieGenerating(true);
+        setMovieProgress(5);
+        let p = 5;
+        const intv = setInterval(() => {
+          p += 15;
+          if (p >= 100) {
+            clearInterval(intv);
+            setIsMovieGenerating(false);
+            setMovieProgress(100);
+            showToast("🎬 9D Movie Project Generated Successfully!");
+          } else {
+            setMovieProgress(p);
+          }
+        }, 400);
+      };
+
+      const sendChatMessage = () => {
+        if (!chatInput.trim()) return;
+        const userMsg = { id: Date.now(), isUser: true, text: chatInput };
+        setChatMessages(prev => [...prev, userMsg]);
+        setChatInput("");
+        setIsChatLoading(true);
+
+        setTimeout(() => {
+          setIsChatLoading(false);
+          setChatMessages(prev => [
+            ...prev,
+            {
+              id: Date.now() + 1,
+              isUser: false,
+              text: `[Gemini 3.5 Flash]\nOptimized Scene Prompt: "${userMsg.text} with 8K volumetric lighting, cyberpunk cybernetic reflections, cinematic depth of field, anamorphic lens flares."`
+            }
+          ]);
+        }, 1200);
+      };
+
+      return (
+        <div className="w-full h-screen overflow-hidden flex flex-col bg-[#0A1930] text-white font-['Orbitron',sans-serif]">
+          {/* Toast Notification */}
+          {toastMessage && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-[#010308] border border-[#00f2fe] text-[#00f2fe] px-4 py-2 rounded-lg text-xs font-bold shadow-lg shadow-[#00f2fe]/20">
+              {toastMessage}
+            </div>
+          )}
+
+          {/* Quick Screen Preview Switcher Toolbar */}
+          <div className="bg-[#010308]/90 border-b border-[#00f2fe]/30 px-3 py-1 flex items-center justify-between text-[10px] text-gray-400 z-40 select-none">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#00f2fe] animate-pulse"></span>
+              <span className="font-bold text-[#00f2fe]">LUMINA AI PREVIEW</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <button 
+                onClick={() => setIsLoggedIn(false)} 
+                className={`px-2 py-0.5 rounded text-[9px] font-bold transition ${!isLoggedIn ? 'bg-[#00f2fe] text-black' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}
+              >
+                LOGIN SCREEN
+              </button>
+              <button 
+                onClick={() => { setIsLoggedIn(true); setCurrentModule('DASHBOARD'); }} 
+                className={`px-2 py-0.5 rounded text-[9px] font-bold transition ${isLoggedIn && currentModule === 'DASHBOARD' ? 'bg-[#00f2fe] text-black' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}
+              >
+                DASHBOARD
+              </button>
+              <button 
+                onClick={() => { setIsLoggedIn(true); setCurrentModule('MOVIE_MAKER'); }} 
+                className={`px-2 py-0.5 rounded text-[9px] font-bold transition ${isLoggedIn && currentModule === 'MOVIE_MAKER' ? 'bg-[#ff007f] text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}
+              >
+                MOVIE
+              </button>
+              <button 
+                onClick={() => { setIsLoggedIn(true); setCurrentModule('AI_CHAT'); }} 
+                className={`px-2 py-0.5 rounded text-[9px] font-bold transition ${isLoggedIn && currentModule === 'AI_CHAT' ? 'bg-[#00f2fe] text-black' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}
+              >
+                CHAT
+              </button>
+            </div>
+          </div>
+
+          {/* Main View Area */}
+          <div className="flex-1 relative overflow-hidden flex flex-col">
+            {!isLoggedIn ? (
+              /* ========================================================= */
+              /* LOGIN SCREEN REPLICA (Matches LoginScreen.kt)              */
+              /* ========================================================= */
+              <div className="w-full h-full flex items-center justify-center p-6 bg-[radial-gradient(ellipse_at_center,_#0A1930_0%,_#010308_100%)]">
+                <div className="flex flex-col items-center justify-center max-w-sm w-full">
+                  {/* Logo Container: 92px square rounded container */}
+                  <div className="w-[92px] h-[92px] rounded-[20px] border-2 border-[#00f2fe] bg-[#00f2fe]/10 p-[3px] shadow-[0_0_25px_rgba(0,242,254,0.4)] flex items-center justify-center overflow-hidden mb-[18px]">
+                    <img 
+                      src="logo.png" 
+                      alt="Lumina Logo" 
+                      className="w-full h-full object-cover rounded-[16px]"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.parentNode.innerHTML = '<i class="fas fa-infinity text-4xl text-[#00f2fe]"></i>';
+                      }}
+                    />
+                  </div>
+
+                  {/* Title & Subtitle */}
+                  <h1 className="text-[22px] font-black text-[#00f2fe] tracking-[2px] text-center drop-shadow-[0_0_10px_rgba(0,242,254,0.6)]">
+                    LUMINA AI
+                  </h1>
+                  <p className="text-[10px] font-semibold text-[#8b949e] tracking-[1.2px] text-center mt-1 mb-[36px]">
+                    AI MOVIE MAKER & 9D SUITE
+                  </p>
+
+                  {/* Login Card Box */}
+                  <div className="w-[90%] max-w-[280px] bg-[#0A1930]/85 border border-[#00f2fe]/40 rounded-[16px] p-5 flex flex-col gap-[14px] shadow-2xl backdrop-blur-md">
+                    {/* Login With Google */}
+                    <button
+                      onClick={() => handleLogin(false)}
+                      className="w-full bg-[#EA4335] hover:bg-[#d9372a] text-white py-[14px] rounded-[10px] font-bold text-[12px] tracking-[0.8px] flex items-center justify-center gap-2 shadow-lg transition active:scale-95"
+                    >
+                      <i className="fas fa-envelope text-sm"></i>
+                      <span>LOGIN WITH GMAIL</span>
+                    </button>
+
+                    {/* Continue As Guest */}
+                    <button
+                      onClick={() => handleLogin(true)}
+                      className="w-full bg-[#00f2fe]/15 hover:bg-[#00f2fe]/25 border border-[#00f2fe] text-[#00f2fe] py-[14px] rounded-[10px] font-bold text-[12px] tracking-[0.8px] flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,242,254,0.2)] transition active:scale-95"
+                    >
+                      <i className="fas fa-shield-alt text-sm"></i>
+                      <span>CONTINUE AS GUEST</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* ========================================================= */
+              /* LOGGED IN APPLICATION VIEW (Matches DashboardScreen.kt)    */
+              /* ========================================================= */
+              <div className="w-full h-full flex flex-col bg-[#010308] p-2 gap-1.5 overflow-hidden">
+                {/* Top Header */}
+                <div className="flex items-center justify-between px-2.5 py-1.5 bg-[#010308]/95 border border-[#00f2fe]/30 rounded-lg flex-shrink-0">
+                  <div className="flex items-center gap-2 cursor-pointer" onClick={() => setCurrentModule('DASHBOARD')}>
+                    <div className="w-7 h-7 rounded-md border border-[#00f2fe] overflow-hidden flex items-center justify-center bg-[#00f2fe]/10">
+                      <img src="logo.png" alt="Logo" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex items-center">
+                      <span className="text-[11px] font-black text-[#00f2fe] tracking-wider">LUMINA AI </span>
+                      <span className="text-[10px] font-black text-[#ff007f] tracking-wide ml-1">MOVIE MAKER</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {/* Coin Pill */}
+                    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#ffd700]/15 border border-[#ffd700] text-[#ffd700] text-[9px] font-bold">
+                      <i className="fas fa-coins text-[9px]"></i>
+                      <span>{coins.toFixed(1)}</span>
+                    </div>
+                    {/* Buy Button */}
+                    <button
+                      onClick={() => setIsStoreOpen(true)}
+                      className="bg-gradient-to-r from-[#ff007f] to-[#7928ca] text-white text-[8px] font-black px-2 py-1 rounded-full shadow-[0_0_8px_rgba(255,0,127,0.4)] hover:brightness-110 active:scale-95 transition"
+                    >
+                      + BUY
+                    </button>
+                  </div>
+                </div>
+
+                {/* Top Ad Banner Slot */}
+                <div 
+                  onClick={watchAd}
+                  className="w-full bg-[#00f2fe]/5 border border-[#00f2fe]/20 rounded-md p-1 cursor-pointer hover:bg-[#00f2fe]/10 transition flex flex-col items-center flex-shrink-0"
+                >
+                  <div className="text-[7.5px] text-gray-400 tracking-wider">--- ADVERTISEMENT SLOT (TAP TO EARN COINS) ---</div>
+                  <div className="w-full h-7 mt-0.5 rounded bg-[#0A1930]/85 border border-[#a855f7]/40 flex items-center justify-center gap-1.5 text-[#a855f7] text-[9px] font-bold tracking-wide">
+                    <i className="fas fa-star text-[10px] text-[#ffd700]"></i>
+                    <span>[ TOP SPONSOR BANNER • TAP TO EARN COINS ]</span>
+                  </div>
+                </div>
+
+                {/* Ticker Bar */}
+                <div className="flex items-center gap-2 px-2 py-1 bg-[#00f2fe]/5 border border-[#00f2fe]/20 rounded-md text-[8.5px] text-gray-300 flex-shrink-0 overflow-hidden whitespace-nowrap">
+                  <i className="fas fa-bullhorn text-[#00f2fe] text-[10px] flex-shrink-0"></i>
+                  <span className="truncate">Welcome to LUMINA AI Movie Maker • 1 min to 80 min AI Movies & BGM Auto-Orchestration Available...</span>
+                </div>
+
+                {/* Content Area Based on Module */}
+                <div className="flex-1 overflow-y-auto flex flex-col">
+                  {currentModule === 'DASHBOARD' && (
+                    <div className="flex-1 flex flex-col gap-1.5">
+                      <div className="text-[10px] font-black text-[#00f2fe] tracking-wider px-0.5">
+                        SYSTEM MODULES
+                      </div>
+
+                      {/* 2x3 Grid */}
+                      <div className="flex-1 grid grid-cols-2 gap-2">
+                        {/* 1. MOVIE MAKER */}
+                        <div 
+                          onClick={() => setCurrentModule('MOVIE_MAKER')}
+                          className="bg-[#0A1930]/80 border border-[#00f2fe]/30 hover:border-[#ff007f] rounded-lg p-2.5 flex flex-col justify-between cursor-pointer transition hover:bg-[#0A1930] active:scale-98 group"
+                        >
+                          <i className="fas fa-film text-lg text-[#ff007f] group-hover:scale-110 transition"></i>
+                          <div>
+                            <div className="text-[10px] font-black text-white tracking-wide">MOVIE MAKER</div>
+                            <div className="text-[7.5px] text-gray-400 truncate">1 to 80 Min AI Movies & BGM</div>
+                          </div>
+                        </div>
+
+                        {/* 2. MEDIA GEN */}
+                        <div 
+                          onClick={() => setCurrentModule('MEDIA_GEN')}
+                          className="bg-[#0A1930]/80 border border-[#00f2fe]/30 hover:border-[#00f2fe] rounded-lg p-2.5 flex flex-col justify-between cursor-pointer transition hover:bg-[#0A1930] active:scale-98 group"
+                        >
+                          <i className="fas fa-photo-video text-lg text-[#00f2fe] group-hover:scale-110 transition"></i>
+                          <div>
+                            <div className="text-[10px] font-black text-white tracking-wide">MEDIA GEN</div>
+                            <div className="text-[7.5px] text-gray-400 truncate">Video & Image Generator</div>
+                          </div>
+                        </div>
+
+                        {/* 3. AI CHAT */}
+                        <div 
+                          onClick={() => setCurrentModule('AI_CHAT')}
+                          className="bg-[#0A1930]/80 border border-[#00f2fe]/30 hover:border-[#00f2fe] rounded-lg p-2.5 flex flex-col justify-between cursor-pointer transition hover:bg-[#0A1930] active:scale-98 group"
+                        >
+                          <i className="fas fa-comments text-lg text-[#00f2fe] group-hover:scale-110 transition"></i>
+                          <div>
+                            <div className="text-[10px] font-black text-white tracking-wide">AI CHAT</div>
+                            <div className="text-[7.5px] text-gray-400 truncate">Gemini Copy Interface</div>
+                          </div>
+                        </div>
+
+                        {/* 4. PROMPT STUDIO */}
+                        <div 
+                          onClick={() => setCurrentModule('PROMPT_STUDIO')}
+                          className="bg-[#0A1930]/80 border border-[#00f2fe]/30 hover:border-[#a855f7] rounded-lg p-2.5 flex flex-col justify-between cursor-pointer transition hover:bg-[#0A1930] active:scale-98 group"
+                        >
+                          <i className="fas fa-magic text-lg text-[#a855f7] group-hover:scale-110 transition"></i>
+                          <div>
+                            <div className="text-[10px] font-black text-white tracking-wide">PROMPT STUDIO</div>
+                            <div className="text-[7.5px] text-gray-400 truncate">Gemini Prompt Bar</div>
+                          </div>
+                        </div>
+
+                        {/* 5. FRIENDS HUB */}
+                        <div 
+                          onClick={() => setCurrentModule('FRIENDS_HUB')}
+                          className="bg-[#0A1930]/80 border border-[#00f2fe]/30 hover:border-[#25D366] rounded-lg p-2.5 flex flex-col justify-between cursor-pointer transition hover:bg-[#0A1930] active:scale-98 group"
+                        >
+                          <i className="fas fa-user-friends text-lg text-[#25D366] group-hover:scale-110 transition"></i>
+                          <div>
+                            <div className="text-[10px] font-black text-white tracking-wide">FRIENDS HUB</div>
+                            <div className="text-[7.5px] text-gray-400 truncate">WhatsApp & Calling (Monetized)</div>
+                          </div>
+                        </div>
+
+                        {/* 6. SETTINGS */}
+                        <div 
+                          onClick={() => setCurrentModule('SETTINGS')}
+                          className="bg-[#0A1930]/80 border border-[#00f2fe]/30 hover:border-[#00f2fe] rounded-lg p-2.5 flex flex-col justify-between cursor-pointer transition hover:bg-[#0A1930] active:scale-98 group"
+                        >
+                          <i className="fas fa-cog text-lg text-[#00f2fe] group-hover:scale-110 transition"></i>
+                          <div>
+                            <div className="text-[10px] font-black text-white tracking-wide">SETTINGS</div>
+                            <div className="text-[7.5px] text-gray-400 truncate">App Feedback & WhatsApp</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SUBMODULE: MOVIE MAKER */}
+                  {currentModule === 'MOVIE_MAKER' && (
+                    <div className="flex-1 flex flex-col gap-2 p-1">
+                      <div className="flex items-center justify-between border-b border-[#00f2fe]/30 pb-1.5">
+                        <button onClick={() => setCurrentModule('DASHBOARD')} className="text-xs text-[#00f2fe] font-bold">
+                          <i className="fas fa-arrow-left mr-1"></i> BACK
+                        </button>
+                        <span className="text-xs font-black text-[#ff007f]">AI MOVIE STUDIO (1-80 MIN)</span>
+                      </div>
+
+                      <div className="bg-[#0A1930] p-3 rounded-lg border border-[#00f2fe]/30 flex flex-col gap-2">
+                        <label className="text-[9px] text-[#00f2fe] font-bold">STORYLINE SCRIPT</label>
+                        <textarea 
+                          value={movieScript}
+                          onChange={(e) => setMovieScript(e.target.value)}
+                          rows="3"
+                          className="w-full bg-[#010308] border border-gray-700 rounded p-2 text-xs text-white focus:border-[#00f2fe] outline-none"
+                        />
+
+                        <div className="grid grid-cols-2 gap-2 mt-1">
+                          <div>
+                            <label className="text-[8px] text-gray-400">DURATION</label>
+                            <select 
+                              value={movieDuration} 
+                              onChange={(e) => setMovieDuration(Number(e.target.value))}
+                              className="w-full bg-[#010308] border border-gray-700 rounded p-1 text-[10px] text-white"
+                            >
+                              <option value="1">1 Min Shorts (2 Coins)</option>
+                              <option value="5">5 Min Scene (5 Coins)</option>
+                              <option value="15">15 Min Clip (10 Coins)</option>
+                              <option value="30">30 Min Drama (15 Coins)</option>
+                              <option value="80">80 Min Full Movie (25 Coins)</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-[8px] text-gray-400">BGM ORCHESTRATION</label>
+                            <select 
+                              value={movieBgm} 
+                              onChange={(e) => setMovieBgm(e.target.value)}
+                              className="w-full bg-[#010308] border border-gray-700 rounded p-1 text-[10px] text-white"
+                            >
+                              <option value="Cinematic Action BGM">Cinematic Action BGM</option>
+                              <option value="Auto (AI Mood)">Auto (AI Mood)</option>
+                              <option value="Cyber Electro">Cyber Electro</option>
+                              <option value="Smooth Jazz">Smooth Jazz</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={buildMovie}
+                          disabled={isMovieGenerating}
+                          className="w-full mt-2 bg-gradient-to-r from-[#ff007f] to-[#7928ca] py-2 rounded text-xs font-black tracking-wider shadow-lg active:scale-95 transition"
+                        >
+                          {isMovieGenerating ? `ORCHESTRATING (${movieProgress}%)...` : "BUILD AI MOVIE"}
+                        </button>
+
+                        {isMovieGenerating && (
+                          <div className="w-full bg-gray-800 h-2 rounded overflow-hidden">
+                            <div className="bg-[#ff007f] h-full transition-all duration-300" style={{ width: `${movieProgress}%` }}></div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SUBMODULE: AI CHAT */}
+                  {currentModule === 'AI_CHAT' && (
+                    <div className="flex-1 flex flex-col gap-2 p-1">
+                      <div className="flex items-center justify-between border-b border-[#00f2fe]/30 pb-1.5">
+                        <button onClick={() => setCurrentModule('DASHBOARD')} className="text-xs text-[#00f2fe] font-bold">
+                          <i className="fas fa-arrow-left mr-1"></i> BACK
+                        </button>
+                        <span className="text-xs font-black text-[#00f2fe]">GEMINI 3.5 FLASH COPY ENGINE</span>
+                      </div>
+
+                      <div className="flex-1 overflow-y-auto flex flex-col gap-2 p-2 bg-[#010308] border border-[#00f2fe]/20 rounded-lg">
+                        {chatMessages.map(msg => (
+                          <div key={msg.id} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[85%] p-2 rounded-lg text-xs ${msg.isUser ? 'bg-[#00f2fe]/20 text-white border border-[#00f2fe]' : 'bg-[#0A1930] text-gray-200 border border-gray-800'}`}>
+                              {msg.text}
+                            </div>
+                          </div>
+                        ))}
+                        {isChatLoading && (
+                          <div className="text-[10px] text-[#00f2fe] italic">Thinking with Gemini...</div>
+                        )}
+                      </div>
+
+                      <div className="flex gap-2">
+                        <input 
+                          type="text"
+                          value={chatInput}
+                          onChange={(e) => setChatInput(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && sendChatMessage()}
+                          placeholder="Ask Gemini to generate movie prompts..."
+                          className="flex-1 bg-[#010308] border border-gray-700 rounded px-2 text-xs text-white focus:border-[#00f2fe] outline-none"
+                        />
+                        <button onClick={sendChatMessage} className="bg-[#00f2fe] text-black px-3 py-1.5 rounded font-black text-xs">
+                          SEND
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SUBMODULE: SETTINGS */}
+                  {currentModule === 'SETTINGS' && (
+                    <div className="flex-1 flex flex-col gap-2 p-1">
+                      <div className="flex items-center justify-between border-b border-[#00f2fe]/30 pb-1.5">
+                        <button onClick={() => setCurrentModule('DASHBOARD')} className="text-xs text-[#00f2fe] font-bold">
+                          <i className="fas fa-arrow-left mr-1"></i> BACK
+                        </button>
+                        <span className="text-xs font-black text-[#00f2fe]">SETTINGS & PROFILE</span>
+                      </div>
+
+                      <div className="bg-[#0A1930] p-3 rounded-lg border border-[#00f2fe]/30 flex flex-col gap-3">
+                        <div className="flex items-center gap-3 border-b border-gray-800 pb-2">
+                          <div className="w-10 h-10 rounded-full border border-[#00f2fe] overflow-hidden">
+                            <img src="logo.png" alt="User" className="w-full h-full object-cover" />
+                          </div>
+                          <div>
+                            <div className="text-xs font-black text-white">Guest Operative</div>
+                            <div className="text-[9px] text-[#00f2fe]">Wallet: {coins.toFixed(1)} Coins</div>
+                          </div>
+                        </div>
+
+                        <button 
+                          onClick={() => setIsStoreOpen(true)}
+                          className="w-full bg-[#ffd700]/20 border border-[#ffd700] text-[#ffd700] py-2 rounded text-xs font-bold"
+                        >
+                          <i className="fas fa-store mr-1.5"></i> OPEN COIN STORE
+                        </button>
+
+                        <button 
+                          onClick={handleLogout}
+                          className="w-full bg-red-500/20 border border-red-500 text-red-400 py-2 rounded text-xs font-bold hover:bg-red-500/30 transition"
+                        >
+                          <i className="fas fa-sign-out-alt mr-1.5"></i> LOGOUT TO LOGIN SCREEN
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SUBMODULE: FRIENDS HUB */}
+                  {currentModule === 'FRIENDS_HUB' && (
+                    <div className="flex-1 flex flex-col gap-2 p-1">
+                      <div className="flex items-center justify-between border-b border-[#00f2fe]/30 pb-1.5">
+                        <button onClick={() => setCurrentModule('DASHBOARD')} className="text-xs text-[#00f2fe] font-bold">
+                          <i className="fas fa-arrow-left mr-1"></i> BACK
+                        </button>
+                        <span className="text-xs font-black text-[#25D366]">FRIENDS HUB (WHATSAPP SYNC)</span>
+                      </div>
+                      <div className="bg-[#0A1930] p-3 rounded-lg border border-[#25D366]/30 flex flex-col gap-2 text-xs">
+                        <div className="flex items-center justify-between p-2 bg-[#010308] rounded border border-gray-800">
+                          <div>
+                            <div className="font-bold text-white">Cyber Producer Sarah</div>
+                            <div className="text-[8px] text-green-400">Online • 9D Audio Director</div>
+                          </div>
+                          <button 
+                            onClick={() => window.open('https://wa.me/?text=Hello%20from%20Lumina%20AI!', '_blank')} 
+                            className="bg-[#25D366] text-black font-bold text-[9px] px-2 py-1 rounded"
+                          >
+                            <i className="fab fa-whatsapp mr-1"></i> CONNECT
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SUBMODULE: MEDIA GEN */}
+                  {currentModule === 'MEDIA_GEN' && (
+                    <div className="flex-1 flex flex-col gap-2 p-1">
+                      <div className="flex items-center justify-between border-b border-[#00f2fe]/30 pb-1.5">
+                        <button onClick={() => setCurrentModule('DASHBOARD')} className="text-xs text-[#00f2fe] font-bold">
+                          <i className="fas fa-arrow-left mr-1"></i> BACK
+                        </button>
+                        <span className="text-xs font-black text-[#00f2fe]">VIDEO & IMAGE GENERATOR</span>
+                      </div>
+                      <div className="bg-[#0A1930] p-3 rounded-lg border border-[#00f2fe]/30 flex flex-col gap-2">
+                        <input 
+                          type="text" 
+                          value={mediaPrompt}
+                          onChange={(e) => setMediaPrompt(e.target.value)}
+                          className="bg-[#010308] border border-gray-700 rounded p-2 text-xs text-white"
+                        />
+                        <button 
+                          onClick={() => showToast("Media Generation Triggered!")}
+                          className="bg-[#00f2fe] text-black font-black text-xs py-2 rounded"
+                        >
+                          GENERATE 9D MEDIA
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SUBMODULE: PROMPT STUDIO */}
+                  {currentModule === 'PROMPT_STUDIO' && (
+                    <div className="flex-1 flex flex-col gap-2 p-1">
+                      <div className="flex items-center justify-between border-b border-[#00f2fe]/30 pb-1.5">
+                        <button onClick={() => setCurrentModule('DASHBOARD')} className="text-xs text-[#00f2fe] font-bold">
+                          <i className="fas fa-arrow-left mr-1"></i> BACK
+                        </button>
+                        <span className="text-xs font-black text-[#a855f7]">PROMPT STUDIO</span>
+                      </div>
+                      <div className="bg-[#0A1930] p-3 rounded-lg border border-[#a855f7]/30 flex flex-col gap-2 text-xs">
+                        <div className="p-2 bg-[#010308] rounded border border-gray-800">
+                          <div className="text-[10px] text-[#a855f7] font-bold">CINEMATIC SCI-FI TEMPLATE</div>
+                          <div className="text-[9px] text-gray-300 mt-1">Anamorphic lens, volumetric smoke, neo-tokyo neon cyber matrix...</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Bottom Ad Banner Slot */}
+                <div 
+                  onClick={watchAd}
+                  className="w-full bg-[#00f2fe]/5 border border-[#00f2fe]/20 rounded-md p-1 cursor-pointer hover:bg-[#00f2fe]/10 transition flex flex-col items-center flex-shrink-0"
+                >
+                  <div className="w-full h-7 rounded bg-[#0A1930]/85 border border-[#ff007f]/40 flex items-center justify-center gap-1.5 text-[#ff007f] text-[9px] font-bold tracking-wide">
+                    <i className="fas fa-play-circle text-[10px] text-[#ff007f]"></i>
+                    <span>[ BOTTOM SPONSOR BANNER • WATCH REWARDED AD ]</span>
+                  </div>
+                </div>
+
+                {/* Bottom Navigation Bar */}
+                <div className="flex items-center justify-around py-1.5 bg-[#010308]/95 border border-[#00f2fe]/30 rounded-lg flex-shrink-0">
+                  {[
+                    { id: 'MOVIE_MAKER', label: 'MOVIE', icon: 'fa-film', color: '#ff007f' },
+                    { id: 'MEDIA_GEN', label: 'MEDIA', icon: 'fa-photo-video', color: '#00f2fe' },
+                    { id: 'AI_CHAT', label: 'AI CHAT', icon: 'fa-comments', color: '#00f2fe' },
+                    { id: 'PROMPT_STUDIO', label: 'PROMPT', icon: 'fa-magic', color: '#a855f7' },
+                    { id: 'FRIENDS_HUB', label: 'FRIENDS', icon: 'fa-user-friends', color: '#25D366' },
+                    { id: 'SETTINGS', label: 'SETTING', icon: 'fa-cog', color: '#00f2fe' }
+                  ].map(item => (
+                    <button
+                      key={item.id}
+                      onClick={() => setCurrentModule(item.id)}
+                      className="flex flex-col items-center flex-1 py-0.5 transition active:scale-90"
+                    >
+                      <i 
+                        className={`fas ${item.icon} text-xs`} 
+                        style={{ color: currentModule === item.id ? item.color : '#8b949e' }}
+                      ></i>
+                      <span 
+                        className="text-[7px] font-bold tracking-wider mt-0.5" 
+                        style={{ color: currentModule === item.id ? '#ffffff' : '#8b949e' }}
+                      >
+                        {item.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* COIN STORE MODAL */}
+          {isStoreOpen && (
+            <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
+              <div className="bg-[#0A1930] border-2 border-[#ffd700] rounded-xl max-w-sm w-full p-4 flex flex-col gap-3 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-[#ffd700]/30 pb-2">
+                  <div className="text-xs font-black text-[#ffd700] flex items-center gap-1.5">
+                    <i className="fas fa-coins text-sm"></i> LUMINA COIN STORE
+                  </div>
+                  <button onClick={() => setIsStoreOpen(false)} className="text-gray-400 hover:text-white text-sm">
+                    <i className="fas fa-times"></i>
+                  </button>
+                </div>
+
+                <div className="text-[10px] text-gray-300">
+                  Current Balance: <span className="font-bold text-[#ffd700]">{coins.toFixed(1)} Coins</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { name: "Starter", price: 100, coins: 50 },
+                    { name: "Pro Movie", price: 250, coins: 150 },
+                    { name: "VIP Studio", price: 500, coins: 400 },
+                    { name: "Ultimate", price: 1000, coins: 1000 }
+                  ].map((pkg, idx) => (
+                    <div 
+                      key={idx}
+                      onClick={() => {
+                        setCoins(c => c + pkg.coins);
+                        setIsStoreOpen(false);
+                        showToast(`Purchased ${pkg.coins} Coins!`);
+                      }}
+                      className="bg-[#010308] border border-gray-700 hover:border-[#ffd700] p-2 rounded-lg cursor-pointer flex flex-col items-center transition"
+                    >
+                      <div className="text-[9px] font-bold text-white">{pkg.name}</div>
+                      <div className="text-xs font-black text-[#ffd700]">+{pkg.coins} Coins</div>
+                      <div className="text-[8px] text-gray-400 mt-1">PKR {pkg.price}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => {
+                    setIsStoreOpen(false);
+                    watchAd();
+                  }}
+                  className="w-full bg-[#00f2fe]/20 border border-[#00f2fe] text-[#00f2fe] py-2 rounded text-[10px] font-bold flex items-center justify-center gap-1.5"
+                >
+                  <i className="fas fa-play"></i> WATCH AD FOR +1.0 FREE COIN ({adsWatched}/3 Today)
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* REWARDED AD OVERLAY */}
+          {isAdPlaying && (
+            <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4">
+              <div className="bg-[#010308] border-2 border-[#ffd700] rounded-2xl max-w-xs w-full p-6 flex flex-col items-center text-center gap-4 shadow-2xl">
+                <i className="fas fa-play-circle text-5xl text-[#ffd700] animate-pulse"></i>
+                <div>
+                  <div className="text-sm font-black text-[#ffd700] tracking-wider">REWARDED SPONSOR AD</div>
+                  <div className="text-[10px] text-gray-400 mt-1">Simulating High-Value Video Impression...</div>
+                </div>
+                <div className="text-xs font-bold text-white bg-white/10 px-4 py-2 rounded-full border border-white/20">
+                  Reward unlocks in: <span className="text-[#ffd700] font-black">{adCountdown}s</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
