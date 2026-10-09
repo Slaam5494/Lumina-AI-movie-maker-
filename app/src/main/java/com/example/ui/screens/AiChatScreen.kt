@@ -1,7 +1,12 @@
+package com.example.ui.screens
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DoNotDisturbOn
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.outlined.DoNotDisturbOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,7 +25,54 @@ val CyberSurface = Color(0xFF161922)
 val CyberAccent = Color(0xFF00E5FF) // Neon Cyan
 val CyberTextSecondary = Color(0xFF8A94A6)
 
-@OptIn(ExperimentalMaterial3Api::class)
+data class ChatMessage(val text: String, val isUser: Boolean)
+
+@Composable
+fun AiChatScreen() {
+    var messageText by remember { mutableStateOf("") }
+    val messages = remember { mutableStateListOf<ChatMessage>() }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(CyberBackground)
+    ) {
+        // Top Bar with Status Bar Padding & DND Toggle
+        TopChatBar(
+            onDndChanged = { isEnabled ->
+                // Handle DND State change if needed
+            }
+        )
+
+        // Chat Message List
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            reverseLayout = false
+        ) {
+            items(messages) { message ->
+                ChatMessageBubble(message = message)
+            }
+        }
+
+        // Bottom Input Area
+        ChatInputArea(
+            text = messageText,
+            onTextChange = { messageText = it },
+            onSend = {
+                if (messageText.isNotBlank()) {
+                    messages.add(ChatMessage(messageText, isUser = true))
+                    // Simple AI Dummy Response
+                    messages.add(ChatMessage("Lumina AI: Processing '$messageText'", isUser = false))
+                    messageText = ""
+                }
+            }
+        )
+    }
+}
+
 @Composable
 fun TopChatBar(
     onDndChanged: (Boolean) -> Unit
@@ -40,8 +92,8 @@ fun TopChatBar(
                     )
                 )
             )
-            .statusBarsPadding() // Ensures top bar stays below camera notch
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .statusBarsPadding()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -54,13 +106,10 @@ fun TopChatBar(
                 color = Color.White
             )
 
-            // Focus / DND Mode Button
             IconButton(
                 onClick = {
                     isDndEnabled = !isDndEnabled
                     onDndChanged(isDndEnabled)
-                    
-                    // Optional: Direct user to system DND settings if needed
                     if (isDndEnabled) {
                         try {
                             val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
@@ -77,6 +126,66 @@ fun TopChatBar(
                     tint = if (isDndEnabled) CyberAccent else CyberTextSecondary
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun ChatMessageBubble(message: ChatMessage) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        contentAlignment = if (message.isUser) Alignment.CenterEnd else Alignment.CenterStart
+    ) {
+        Surface(
+            color = if (message.isUser) CyberAccent.copy(alpha = 0.2f) else CyberSurface,
+            shape = MaterialTheme.shapes.medium
+        ) {
+            Text(
+                text = message.text,
+                color = Color.White,
+                modifier = Modifier.padding(12.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun ChatInputArea(
+    text: String,
+    onTextChange: (String) -> Unit,
+    onSend: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        OutlinedTextField(
+            value = text,
+            onValueChange = onTextChange,
+            modifier = Modifier.weight(1f),
+            placeholder = { Text("Ask Lumina AI...", color = CyberTextSecondary) },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = CyberAccent,
+                unfocusedBorderColor = CyberSurface,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
+            )
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        IconButton(
+            onClick = onSend,
+            modifier = Modifier.background(CyberAccent, shape = MaterialTheme.shapes.small)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Send,
+                contentDescription = "Send",
+                tint = Color.Black
+            )
         }
     }
 }
