@@ -26,46 +26,47 @@ val CyberSurface = Color(0xFF161922)
 val CyberAccent = Color(0xFF00E5FF) // Neon Cyan
 val CyberTextSecondary = Color(0xFF8A94A6)
 
-data class ChatMessage(val text: String, val isUser: Boolean)
-
 @Composable
 fun AiChatScreen(
-    modifier: Modifier = Modifier,
-    uiState: Any? = null,
-    onClearChat: () -> Unit = {},
-    onNavigateBack: () -> Unit = {},
-    onSendMessage: (String) -> Unit = {},
-    onDndToggle: (Boolean) -> Unit = {}
+    messages: List<Any> = emptyList(),
+    isGenerating: Boolean = false,
+    onBack: () -> Unit = {},
+    onSendMessage: (String, String) -> Unit = { _, _ -> },
+    onClearChat: () -> Unit = {}
 ) {
     var messageText by remember { mutableStateOf("") }
-    val messages = remember { mutableStateListOf<ChatMessage>() }
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(CyberBackground)
     ) {
         // Top Bar with Status Bar Padding, DND Toggle & Clear Chat Action
         TopChatBar(
             onDndChanged = { isEnabled ->
-                onDndToggle(isEnabled)
+                // Handle DND logic
             },
-            onClearChat = {
-                messages.clear()
-                onClearChat()
-            }
+            onClearChat = onClearChat
         )
+
+        // Progress bar when generating AI response
+        if (isGenerating) {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth(),
+                color = CyberAccent,
+                trackColor = CyberSurface
+            )
+        }
 
         // Chat Message List
         LazyColumn(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            reverseLayout = false
+                .padding(horizontal = 16.dp)
         ) {
             items(messages) { message ->
-                ChatMessageBubble(message = message)
+                ChatMessageBubble(message = message.toString())
             }
         }
 
@@ -75,10 +76,7 @@ fun AiChatScreen(
             onTextChange = { messageText = it },
             onSend = {
                 if (messageText.isNotBlank()) {
-                    val userText = messageText
-                    messages.add(ChatMessage(userText, isUser = true))
-                    onSendMessage(userText)
-                    messages.add(ChatMessage("Lumina AI: Processing '$userText'", isUser = false))
+                    onSendMessage(messageText, "default")
                     messageText = ""
                 }
             }
@@ -157,19 +155,19 @@ fun TopChatBar(
 }
 
 @Composable
-fun ChatMessageBubble(message: ChatMessage) {
+fun ChatMessageBubble(message: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        contentAlignment = if (message.isUser) Alignment.CenterEnd else Alignment.CenterStart
+        contentAlignment = Alignment.CenterStart
     ) {
         Surface(
-            color = if (message.isUser) CyberAccent.copy(alpha = 0.2f) else CyberSurface,
+            color = CyberSurface,
             shape = MaterialTheme.shapes.medium
         ) {
             Text(
-                text = message.text,
+                text = message,
                 color = Color.White,
                 modifier = Modifier.padding(12.dp)
             )
