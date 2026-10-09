@@ -34,7 +34,7 @@ fun AiChatScreen(
     onClearChat: () -> Unit = {},
     onNavigateBack: () -> Unit = {},
     onSendMessage: (String) -> Unit = {},
-    uiState: Any? = null
+    onDndToggle: (Boolean) -> Unit = {}
 ) {
     var messageText by remember { mutableStateOf("") }
     val messages = remember { mutableStateListOf<ChatMessage>() }
@@ -47,7 +47,7 @@ fun AiChatScreen(
         // Top Bar with Status Bar Padding, DND Toggle & Clear Chat Action
         TopChatBar(
             onDndChanged = { isEnabled ->
-                // Handle DND State change
+                onDndToggle(isEnabled)
             },
             onClearChat = {
                 messages.clear()
@@ -74,9 +74,10 @@ fun AiChatScreen(
             onTextChange = { messageText = it },
             onSend = {
                 if (messageText.isNotBlank()) {
-                    messages.add(ChatMessage(messageText, isUser = true))
-                    onSendMessage(messageText)
-                    messages.add(ChatMessage("Lumina AI: Processing '$messageText'", isUser = false))
+                    val userText = messageText
+                    messages.add(ChatMessage(userText, isUser = true))
+                    onSendMessage(userText)
+                    messages.add(ChatMessage("Lumina AI: Processing '$userText'", isUser = false))
                     messageText = ""
                 }
             }
