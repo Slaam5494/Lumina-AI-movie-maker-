@@ -31,6 +31,7 @@ data class ChatMessage(val text: String, val isUser: Boolean)
 @Composable
 fun AiChatScreen(
     modifier: Modifier = Modifier,
+    uiState: Any? = null,
     onClearChat: () -> Unit = {},
     onNavigateBack: () -> Unit = {},
     onSendMessage: (String) -> Unit = {},
