@@ -34,7 +34,7 @@ fun MediaGenScreen(
     isImageGenerating: Boolean = false,
     userCoins: Int = 0,
     onBack: () -> Unit = {},
-    onGenerateVideo: (String, String, String, String, String) -> Unit = { _, _, _, _, _ -> },
+    onGenerateVideo: (String, String, String, Int, String) -> Unit = { _, _, _, _, _ -> },
     onGenerateImage: (String, String, String) -> Unit = { _, _, _ -> }
 ) {
     var promptText by remember { mutableStateOf("") }
@@ -115,7 +115,7 @@ fun MediaGenScreen(
                 Button(
                     onClick = {
                         if (promptText.isNotBlank()) {
-                            onGenerateVideo(promptText, "Cinematic", "16:9", "5s", "Smooth")
+                            onGenerateVideo(promptText, "Cinematic", "16:9", 5, "Smooth")
                         }
                     },
                     modifier = Modifier.weight(1f),
@@ -161,13 +161,13 @@ fun MediaGenScreen(
             title = { Text("Asset Options", color = Color.White) },
             text = {
                 Column {
-                    TextButton(onClick = { /* Download */ showMenuForItem = null }) {
+                    TextButton(onClick = { showMenuForItem = null }) {
                         Text("Download Asset", color = Color.White)
                     }
-                    TextButton(onClick = { /* Share */ showMenuForItem = null }) {
+                    TextButton(onClick = { showMenuForItem = null }) {
                         Text("Share Asset", color = Color.White)
                     }
-                    TextButton(onClick = { /* Delete */ showMenuForItem = null }) {
+                    TextButton(onClick = { showMenuForItem = null }) {
                         Text("Delete Asset", color = Color.Red)
                     }
                 }
