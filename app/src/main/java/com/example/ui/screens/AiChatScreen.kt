@@ -30,20 +30,24 @@ data class ChatMessage(val text: String, val isUser: Boolean)
 
 @Composable
 fun AiChatScreen(
-    onClearChat: () -> Unit = {}
+    modifier: Modifier = Modifier,
+    onClearChat: () -> Unit = {},
+    onNavigateBack: () -> Unit = {},
+    onSendMessage: (String) -> Unit = {},
+    uiState: Any? = null
 ) {
     var messageText by remember { mutableStateOf("") }
     val messages = remember { mutableStateListOf<ChatMessage>() }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(CyberBackground)
     ) {
         // Top Bar with Status Bar Padding, DND Toggle & Clear Chat Action
         TopChatBar(
             onDndChanged = { isEnabled ->
-                // Handle DND State change if needed
+                // Handle DND State change
             },
             onClearChat = {
                 messages.clear()
@@ -71,6 +75,7 @@ fun AiChatScreen(
             onSend = {
                 if (messageText.isNotBlank()) {
                     messages.add(ChatMessage(messageText, isUser = true))
+                    onSendMessage(messageText)
                     messages.add(ChatMessage("Lumina AI: Processing '$messageText'", isUser = false))
                     messageText = ""
                 }
