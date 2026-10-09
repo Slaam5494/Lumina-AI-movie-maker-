@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DoNotDisturbOn
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.outlined.DoNotDisturbOff
@@ -28,7 +29,9 @@ val CyberTextSecondary = Color(0xFF8A94A6)
 data class ChatMessage(val text: String, val isUser: Boolean)
 
 @Composable
-fun AiChatScreen() {
+fun AiChatScreen(
+    onClearChat: () -> Unit = {}
+) {
     var messageText by remember { mutableStateOf("") }
     val messages = remember { mutableStateListOf<ChatMessage>() }
 
@@ -37,10 +40,14 @@ fun AiChatScreen() {
             .fillMaxSize()
             .background(CyberBackground)
     ) {
-        // Top Bar with Status Bar Padding & DND Toggle
+        // Top Bar with Status Bar Padding, DND Toggle & Clear Chat Action
         TopChatBar(
             onDndChanged = { isEnabled ->
                 // Handle DND State change if needed
+            },
+            onClearChat = {
+                messages.clear()
+                onClearChat()
             }
         )
 
@@ -64,7 +71,6 @@ fun AiChatScreen() {
             onSend = {
                 if (messageText.isNotBlank()) {
                     messages.add(ChatMessage(messageText, isUser = true))
-                    // Simple AI Dummy Response
                     messages.add(ChatMessage("Lumina AI: Processing '$messageText'", isUser = false))
                     messageText = ""
                 }
@@ -75,7 +81,8 @@ fun AiChatScreen() {
 
 @Composable
 fun TopChatBar(
-    onDndChanged: (Boolean) -> Unit
+    onDndChanged: (Boolean) -> Unit,
+    onClearChat: () -> Unit
 ) {
     var isDndEnabled by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -106,25 +113,37 @@ fun TopChatBar(
                 color = Color.White
             )
 
-            IconButton(
-                onClick = {
-                    isDndEnabled = !isDndEnabled
-                    onDndChanged(isDndEnabled)
-                    if (isDndEnabled) {
-                        try {
-                            val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
-                            context.startActivity(intent)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                // Clear Chat Button
+                IconButton(onClick = onClearChat) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Clear Chat",
+                        tint = CyberTextSecondary
+                    )
+                }
+
+                // Focus / DND Mode Button
+                IconButton(
+                    onClick = {
+                        isDndEnabled = !isDndEnabled
+                        onDndChanged(isDndEnabled)
+                        if (isDndEnabled) {
+                            try {
+                                val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+                                context.startActivity(intent)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
                         }
                     }
+                ) {
+                    Icon(
+                        imageVector = if (isDndEnabled) Icons.Filled.DoNotDisturbOn else Icons.Outlined.DoNotDisturbOff,
+                        contentDescription = "Focus DND Mode",
+                        tint = if (isDndEnabled) CyberAccent else CyberTextSecondary
+                    )
                 }
-            ) {
-                Icon(
-                    imageVector = if (isDndEnabled) Icons.Filled.DoNotDisturbOn else Icons.Outlined.DoNotDisturbOff,
-                    contentDescription = "Focus DND Mode",
-                    tint = if (isDndEnabled) CyberAccent else CyberTextSecondary
-                )
             }
         }
     }
