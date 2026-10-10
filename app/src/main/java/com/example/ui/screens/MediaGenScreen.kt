@@ -34,7 +34,7 @@ fun MediaGenScreen(
     isImageGenerating: Boolean = false,
     userCoins: Int = 0,
     onBack: () -> Unit = {},
-    onGenerateVideo: (prompt: String, style: String, ratio: String, duration: Double, motion: String) -> Unit = { _, _, _, _, _ -> },
+    onGenerateVideo: (prompt: String, style: String, ratio: String, duration: Int, motion: String) -> Unit = { _, _, _, _, _ -> },
     onGenerateImage: (prompt: String, style: String, ratio: String) -> Unit = { _, _, _ -> }
 ) {
     var promptText by remember { mutableStateOf("") }
@@ -111,7 +111,8 @@ fun MediaGenScreen(
                 Button(
                     onClick = {
                         if (promptText.isNotBlank()) {
-                            onGenerateVideo(promptText, "Cinematic", "16:9", 5.0, "Smooth")
+                            // Yahan duration ko Integer (5) pass kiya gaya hai taaki MainActivity match ho jaye
+                            onGenerateVideo(promptText, "Cinematic", "16:9", 5, "Smooth")
                         }
                     },
                     modifier = Modifier.weight(1f),
