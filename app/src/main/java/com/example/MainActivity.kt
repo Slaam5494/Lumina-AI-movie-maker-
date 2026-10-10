@@ -184,7 +184,10 @@ fun LuminaApp(
                                 userCoins = userAccount.coins,
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
                                 onGenerateVideo = { prompt, style, ratio, duration, motion ->
-                                    val videoDur = duration.toString().toDoubleOrNull()?.toInt() ?: 5
+                                    val videoDur = when (duration) {
+                                        is Number -> duration.toInt()
+                                        else -> duration.toString().toDoubleOrNull()?.toInt() ?: 5
+                                    }
                                     viewModel.generateVideo(prompt, style, ratio, videoDur, motion)
                                 },
                                 onGenerateImage = { prompt, style, ratio ->
