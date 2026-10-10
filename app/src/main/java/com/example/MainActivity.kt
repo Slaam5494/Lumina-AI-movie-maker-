@@ -165,9 +165,8 @@ fun LuminaApp(
                                 progress = progress,
                                 userCoins = userAccount.coins,
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
-                                onBuildMovie = { script, duration, bgm ->
-                                    val safeDur = duration.toInt()
-                                    viewModel.buildMovieProject(script, safeDur, bgm)
+                                onBuildMovie = { script, duration: Double, bgm ->
+                                    viewModel.buildMovieProject(script, duration.toInt(), bgm)
                                 }
                             )
                         }
@@ -183,9 +182,8 @@ fun LuminaApp(
                                 isImageGenerating = isImageGenerating,
                                 userCoins = userAccount.coins,
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
-                                onGenerateVideo = { prompt, style, ratio, duration, motion ->
-                                    val safeVideoDur = duration.toInt()
-                                    viewModel.generateVideo(prompt, style, ratio, safeVideoDur, motion)
+                                onGenerateVideo = { prompt, style, ratio, duration: Double, motion ->
+                                    viewModel.generateVideo(prompt, style, ratio, duration.toInt(), motion)
                                 },
                                 onGenerateImage = { prompt, style, ratio ->
                                     viewModel.generateImage(prompt, style, ratio)
@@ -225,118 +223,3 @@ fun LuminaApp(
                             val callSeconds by viewModel.callSeconds.collectAsStateWithLifecycle()
                             val isMuted by viewModel.isMuted.collectAsStateWithLifecycle()
                             val isSpeakerOn by viewModel.isSpeakerOn.collectAsStateWithLifecycle()
-                            val activeChatFriend by viewModel.activeChatFriend.collectAsStateWithLifecycle()
-                            val directMessages by viewModel.directMessages.collectAsStateWithLifecycle()
-                            FriendsHubScreen(
-                                friends = friends,
-                                statuses = statuses,
-                                activeCallFriend = activeCallFriend,
-                                isVideoCall = isVideoCall,
-                                callSeconds = callSeconds,
-                                isMuted = isMuted,
-                                isSpeakerOn = isSpeakerOn,
-                                activeChatFriend = activeChatFriend,
-                                directMessages = directMessages,
-                                onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
-                                onOpenStore = { viewModel.openCoinStore() },
-                                onStartCall = { friend, isVideo -> viewModel.startCall(friend, isVideo) },
-                                onEndCall = { viewModel.endCall() },
-                                onToggleMute = { viewModel.toggleMute() },
-                                onToggleSpeaker = { viewModel.toggleSpeaker() },
-                                onOpenChat = { viewModel.openFriendChat(it) },
-                                onCloseChat = { viewModel.closeFriendChat() },
-                                onSendDirectMessage = { viewModel.sendDirectMessage(it) },
-                                onSaveStatus = { viewModel.saveStatus(it) },
-                                onOpenWhatsApp = { ctx, phone -> viewModel.openWhatsAppChat(ctx, phone) },
-                                onWatchAd = { viewModel.watchRewardedAd() }
-                            )
-                        }
-                        ModuleType.SETTINGS -> {
-                            SettingsScreen(
-                                userAccount = userAccount,
-                                onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
-                                onOpenStore = { viewModel.openCoinStore() },
-                                onLogout = { viewModel.logout() },
-                                onOpenWhatsApp = { ctx, phone -> viewModel.openWhatsAppChat(ctx, phone) },
-                                onShowFeedbackToast = {
-                                    Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        // Coin Store Modal
-        if (isCoinStoreOpen) {
-            CoinStoreModal(
-                currentBalance = userAccount.coins,
-                adsWatchedToday = userAccount.adsWatchedToday,
-                packages = viewModel.coinPackages,
-                onBuyPackage = { method, pkgId -> viewModel.processPayment(method, pkgId) },
-                onWatchRewardedAd = { viewModel.watchRewardedAd() },
-                onClose = { viewModel.closeCoinStore() }
-            )
-        }
-
-        // Rewarded Ad Simulation Overlay
-        if (isAdPlaying) {
-            RewardedAdOverlay(countdown = adCountdown)
-        }
-    }
-}
-
-@Composable
-fun RewardedAdOverlay(
-    countdown: Int,
-    modifier: Modifier = Modifier
-) {
-    Dialog(onDismissRequest = {}) {
-        Box(
-            modifier = modifier
-                .fillMaxWidth(0.9f)
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color(0xFF010308))
-                .border(BorderStroke(2.dp, LuminaGold), RoundedCornerShape(16.dp))
-                .padding(24.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.PlayCircle,
-                    contentDescription = null,
-                    tint = LuminaGold,
-                    modifier = Modifier.size(56.dp)
-                )
-                Text(
-                    text = "REWARDED SPONSOR AD",
-                    color = LuminaGold,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Black,
-                    letterSpacing = 1.sp
-                )
-                Text(
-                    text = "Simulating AdMob High-Value Video Impression...",
-                    color = LuminaTextSecondary,
-                    fontSize = 10.sp,
-                    textAlign = TextAlign.Center
-                )
-                CircularProgressIndicator(
-                    color = LuminaGold,
-                    trackColor = Color(0xFF1E2028),
-                    modifier = Modifier.size(36.dp)
-                )
-                Text(
-                    text = "Reward unlocks in: ${countdown}s",
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-    }
-}
