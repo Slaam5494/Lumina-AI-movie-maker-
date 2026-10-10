@@ -34,7 +34,7 @@ fun MediaGenScreen(
     isImageGenerating: Boolean = false,
     userCoins: Int = 0,
     onBack: () -> Unit = {},
-    onGenerateVideo: (String, String, String, Int, String) -> Unit = { _, _, _, _, _ -> },
+    onGenerateVideo: (String, String, String, Any, String) -> Unit = { _, _, _, _, _ -> },
     onGenerateImage: (String, String, String) -> Unit = { _, _, _ -> }
 ) {
     var promptText by remember { mutableStateOf("") }
@@ -50,8 +50,7 @@ fun MediaGenScreen(
                     }
                 },
                 actions = {
-                    // Upload Reference Media Button
-                    IconButton(onClick = { /* Pick/Upload Media */ }) {
+                    IconButton(onClick = { /* Upload Reference Media */ }) {
                         Icon(
                             imageVector = Icons.Default.UploadFile,
                             contentDescription = "Upload Reference",
@@ -70,7 +69,6 @@ fun MediaGenScreen(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-            // Loading Indicator
             if (isVideoGenerating || isImageGenerating) {
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
@@ -79,7 +77,6 @@ fun MediaGenScreen(
                 )
             }
 
-            // Input Prompt Box
             OutlinedTextField(
                 value = promptText,
                 onValueChange = { promptText = it },
@@ -95,7 +92,6 @@ fun MediaGenScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Generate Action Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -131,7 +127,6 @@ fun MediaGenScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Grid displaying media with Long-Press Action Menu & Download Button
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier.fillMaxSize(),
@@ -141,7 +136,7 @@ fun MediaGenScreen(
                 items(imageList + videoList) { item ->
                     MediaCardItem(
                         itemTitle = item.toString(),
-                        onDownload = { /* Download functionality */ },
+                        onDownload = { },
                         onLongPress = { showMenuForItem = item.toString() }
                     )
                 }
@@ -149,8 +144,7 @@ fun MediaGenScreen(
         }
     }
 
-    // Long Press Context Dialog / Menu
-    showMenuForItem?.let { itemTitle ->
+    showMenuForItem?.let { _ ->
         AlertDialog(
             onDismissRequest = { showMenuForItem = null },
             confirmButton = {
@@ -202,7 +196,6 @@ fun MediaCardItem(
             modifier = Modifier.align(Alignment.TopStart)
         )
 
-        // Direct Download Action Button
         IconButton(
             onClick = onDownload,
             modifier = Modifier.align(Alignment.BottomEnd)
