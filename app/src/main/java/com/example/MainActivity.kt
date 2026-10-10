@@ -166,8 +166,10 @@ fun LuminaApp(
                                 userCoins = userAccount.coins,
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
                                 onBuildMovie = { script, duration, bgm ->
-                                    // Yahan safely Number cast kar ke Int bana diya gaya hai taake koi bhi error na aaye
-                                    val safeDuration = (duration as? Number)?.toInt() ?: 60
+                                    val safeDuration = when (duration) {
+                                        is Number -> duration.toInt()
+                                        else -> duration.toString().toIntOrNull() ?: 60
+                                    }
                                     viewModel.buildMovieProject(script, safeDuration, bgm)
                                 }
                             )
