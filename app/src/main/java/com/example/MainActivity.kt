@@ -166,7 +166,8 @@ fun LuminaApp(
                                 userCoins = userAccount.coins,
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
                                 onBuildMovie = { script, duration, bgm ->
-                                    viewModel.buildMovieProject(script, duration, bgm)
+                                    // duration ko explicitly .toInt() mein convert kar diya gaya hai
+                                    viewModel.buildMovieProject(script, duration.toInt(), bgm)
                                 }
                             )
                         }
