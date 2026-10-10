@@ -165,8 +165,8 @@ fun LuminaApp(
                                 progress = progress,
                                 userCoins = userAccount.coins,
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
-                                onBuildMovie = { script, duration: Int, bgm ->
-                                    viewModel.buildMovieProject(script, duration, bgm)
+                                onBuildMovie = { script, duration: Double, bgm ->
+                                    viewModel.buildMovieProject(script, duration.toInt(), bgm)
                                 }
                             )
                         }
