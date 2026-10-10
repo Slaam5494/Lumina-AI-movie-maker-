@@ -166,7 +166,6 @@ fun LuminaApp(
                                 userCoins = userAccount.coins,
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
                                 onBuildMovie = { script, duration, bgm ->
-                                    // Yahan duration ko explicitly Int mein cast kar diya gaya hai
                                     viewModel.buildMovieProject(script, duration.toInt(), bgm)
                                 }
                             )
