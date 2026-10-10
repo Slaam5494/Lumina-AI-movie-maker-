@@ -166,7 +166,7 @@ fun LuminaApp(
                                 userCoins = userAccount.coins,
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
                                 onBuildMovie = { script, duration, bgm ->
-                                    val safeDur = duration.toString().toDoubleOrNull()?.toInt() ?: 60
+                                    val safeDur = duration.toInt()
                                     viewModel.buildMovieProject(script, safeDur, bgm)
                                 }
                             )
@@ -184,11 +184,8 @@ fun LuminaApp(
                                 userCoins = userAccount.coins,
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
                                 onGenerateVideo = { prompt, style, ratio, duration, motion ->
-                                    val videoDur = when (duration) {
-                                        is Number -> duration.toInt()
-                                        else -> duration.toString().toDoubleOrNull()?.toInt() ?: 5
-                                    }
-                                    viewModel.generateVideo(prompt, style, ratio, videoDur, motion)
+                                    val safeVideoDur = duration.toInt()
+                                    viewModel.generateVideo(prompt, style, ratio, safeVideoDur, motion)
                                 },
                                 onGenerateImage = { prompt, style, ratio ->
                                     viewModel.generateImage(prompt, style, ratio)
