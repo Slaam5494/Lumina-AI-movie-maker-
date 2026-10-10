@@ -34,7 +34,7 @@ fun MediaGenScreen(
     isImageGenerating: Boolean = false,
     userCoins: Int = 0,
     onBack: () -> Unit = {},
-    onGenerateVideo: (String, String, String, Any, String) -> Unit = { _, _, _, _, _ -> },
+    onGenerateVideo: (String, String, String, Int, String) -> Unit = { _, _, _, _, _ -> },
     onGenerateImage: (String, String, String) -> Unit = { _, _, _ -> }
 ) {
     var promptText by remember { mutableStateOf("") }
