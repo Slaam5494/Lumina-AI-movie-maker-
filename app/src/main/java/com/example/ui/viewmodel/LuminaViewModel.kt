@@ -186,7 +186,14 @@ class LuminaViewModel(
     }
 
     // AI MOVIE MAKER (1 to 80 Min AI Movies & BGM)
-    fun buildMovieProject(script: String, durationMinutes: Int, bgmStyle: String) {
+    // Here duration is converted safely to Int regardless of whether Double or Int is passed
+    fun buildMovieProject(script: String, rawDuration: Any, bgmStyle: String) {
+        val durationMinutes = when (rawDuration) {
+            is Number -> rawDuration.toInt()
+            is String -> rawDuration.toIntOrNull() ?: 60
+            else -> 60
+        }
+
         if (isUnsafe(script)) {
             _toastMessage.value = "⚠️ Safety Guard Active: NSFW or explicit prompts are strictly prohibited."
             return
