@@ -27,8 +27,8 @@ fun MovieMakerScreen(
     progress: Float = 0f,
     userCoins: Int = 0,
     onBack: () -> Unit = {},
-    // duration ko yahan Int set kar diya gaya hai
-    onBuildMovie: (script: String, duration: Int, bgm: String) -> Unit = { _, _, _ -> }
+    // Yahan duration ko Double kar diya gaya hai taake error khatam ho jaye
+    onBuildMovie: (script: String, duration: Double, bgm: String) -> Unit = { _, _, _ -> }
 ) {
     var scriptText by remember { mutableStateOf("") }
     var bgmText by remember { mutableStateOf("Default BGM") }
@@ -80,8 +80,7 @@ fun MovieMakerScreen(
             Button(
                 onClick = {
                     if (scriptText.isNotBlank()) {
-                        // duration yahan 60 (Int) pass kiya gaya hai
-                        onBuildMovie(scriptText, 60, bgmText)
+                        onBuildMovie(scriptText, 60.0, bgmText)
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
