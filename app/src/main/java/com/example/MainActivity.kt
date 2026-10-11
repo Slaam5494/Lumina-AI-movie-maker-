@@ -165,17 +165,12 @@ fun LuminaApp(
                                 progress = progress,
                                 userCoins = userAccount.coins,
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
-                                onBuildMovie = { script, duration: Int, bgm ->
-                                    viewModel.buildMovieProject(script, duration, bgm)
+                                onBuildMovie = { script, duration, bgm ->
+                                    viewModel.buildMovieProject(script, duration.toInt(), bgm)
                                 }
                             )
                         }
                         ModuleType.MEDIA_GEN -> {
-                            val videoList by viewModel.videoList.collectAsStateWithLifecycle()
-                            val imageList by viewModel.imageList.collectAsStateWithLifecycle()
-                            val isVideoGenerating by viewModel.isVideoGenerating.collectAsStateWithLifecycle()
-                            val isImageGenerating by viewModel.isImageGenerating.collectAsStateWithLifecycle()
-                                               ModuleType.MEDIA_GEN -> {
                             val videoList by viewModel.videoList.collectAsStateWithLifecycle()
                             val imageList by viewModel.imageList.collectAsStateWithLifecycle()
                             val isVideoGenerating by viewModel.isVideoGenerating.collectAsStateWithLifecycle()
@@ -195,7 +190,6 @@ fun LuminaApp(
                                 }
                             )
                         }
-
                         ModuleType.AI_CHAT -> {
                             val messages by viewModel.chatMessages.collectAsStateWithLifecycle()
                             val isGenerating by viewModel.isChatGenerating.collectAsStateWithLifecycle()
@@ -276,7 +270,7 @@ fun LuminaApp(
         if (isCoinStoreOpen) {
             CoinStoreModal(
                 currentBalance = userAccount.coins,
-                    adsWatchedToday = userAccount.adsWatchedToday,
+                adsWatchedToday = userAccount.adsWatchedToday,
                 packages = viewModel.coinPackages,
                 onBuyPackage = { method, pkgId -> viewModel.processPayment(method, pkgId) },
                 onWatchRewardedAd = { viewModel.watchRewardedAd() },
