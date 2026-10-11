@@ -175,6 +175,11 @@ fun LuminaApp(
                             val imageList by viewModel.imageList.collectAsStateWithLifecycle()
                             val isVideoGenerating by viewModel.isVideoGenerating.collectAsStateWithLifecycle()
                             val isImageGenerating by viewModel.isImageGenerating.collectAsStateWithLifecycle()
+                                               ModuleType.MEDIA_GEN -> {
+                            val videoList by viewModel.videoList.collectAsStateWithLifecycle()
+                            val imageList by viewModel.imageList.collectAsStateWithLifecycle()
+                            val isVideoGenerating by viewModel.isVideoGenerating.collectAsStateWithLifecycle()
+                            val isImageGenerating by viewModel.isImageGenerating.collectAsStateWithLifecycle()
                             MediaGenScreen(
                                 videoList = videoList,
                                 imageList = imageList,
@@ -182,14 +187,15 @@ fun LuminaApp(
                                 isImageGenerating = isImageGenerating,
                                 userCoins = userAccount.coins,
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
-                                onGenerateVideo = { prompt, style, ratio, duration: Int, motion ->
-                                    viewModel.generateVideo(prompt, style, ratio, duration, motion)
+                                onGenerateVideo = { prompt, style, ratio, duration, motion ->
+                                    viewModel.generateVideo(prompt, style, ratio, duration.toInt(), motion)
                                 },
                                 onGenerateImage = { prompt, style, ratio ->
                                     viewModel.generateImage(prompt, style, ratio)
                                 }
                             )
                         }
+
                         ModuleType.AI_CHAT -> {
                             val messages by viewModel.chatMessages.collectAsStateWithLifecycle()
                             val isGenerating by viewModel.isChatGenerating.collectAsStateWithLifecycle()
