@@ -165,9 +165,8 @@ fun LuminaApp(
                                 progress = progress,
                                 userCoins = userAccount.coins,
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
-                                onBuildMovie = { script, duration, bgm ->
-                                    val safeDur = duration.toString().toDoubleOrNull()?.toInt() ?: 60
-                                    viewModel.buildMovieProject(script, safeDur, bgm)
+                                onBuildMovie = { script, duration: Int, bgm ->
+                                    viewModel.buildMovieProject(script, duration, bgm)
                                 }
                             )
                         }
@@ -183,9 +182,8 @@ fun LuminaApp(
                                 isImageGenerating = isImageGenerating,
                                 userCoins = userAccount.coins,
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
-                                onGenerateVideo = { prompt, style, ratio, duration, motion ->
-                                    val safeVideoDur = duration.toString().toDoubleOrNull()?.toInt() ?: 5
-                                    viewModel.generateVideo(prompt, style, ratio, safeVideoDur, motion)
+                                onGenerateVideo = { prompt, style, ratio, duration: Int, motion ->
+                                    viewModel.generateVideo(prompt, style, ratio, duration, motion)
                                 },
                                 onGenerateImage = { prompt, style, ratio ->
                                     viewModel.generateImage(prompt, style, ratio)
@@ -272,7 +270,7 @@ fun LuminaApp(
         if (isCoinStoreOpen) {
             CoinStoreModal(
                 currentBalance = userAccount.coins,
-                adsWatchedToday = userAccount.adsWatchedToday,
+                    adsWatchedToday = userAccount.adsWatchedToday,
                 packages = viewModel.coinPackages,
                 onBuyPackage = { method, pkgId -> viewModel.processPayment(method, pkgId) },
                 onWatchRewardedAd = { viewModel.watchRewardedAd() },
