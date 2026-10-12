@@ -30,7 +30,6 @@ class MainActivity : ComponentActivity() {
                     var hasUsedDailyFreeVideo by remember { mutableStateOf(false) }
                     var remainingFreeImages by remember { mutableIntStateOf(3) }
 
-                    // Safety handling so app never crashes on navigation mismatch
                     when (currentScreen) {
                         "dashboard" -> {
                             DashboardScreen(
@@ -102,17 +101,18 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
-                         "friends_hub" -> {
+                        "friends_hub" -> {
                             FriendsHubScreen(
-                             coinBalance = userCoins,
-                             onBack = { currentScreen = "dashboard" },
-                             onAddFriend = { userCoins += 3 },
-                             onShareApp = { userCoins += 5 },
-                             onOpenWhatsApp = { /* WhatsApp open logic */ },
-                            onWatchAd = { userCoins += 10 }
-                        )
-                         }
-
+                                coinBalance = userCoins,
+                                onBack = { currentScreen = "dashboard" },
+                                onAddFriend = { userCoins += 3 },
+                                onShareApp = { userCoins += 5 },
+                                onOpenWhatsApp = { /* WhatsApp open logic */ },
+                                onWatchAd = { userCoins += 10 },
+                                onSendDirectMessage = { /* Direct message logic */ },
+                                onSaveStatus = { /* Save status logic */ }
+                            )
+                        }
                         else -> {
                             DashboardScreen(
                                 coinBalance = userCoins.toDouble(),
