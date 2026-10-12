@@ -21,7 +21,6 @@ class MainActivity : ComponentActivity() {
                 color = MaterialTheme.colorScheme.background
             ) {
                 // آپ کا مرکزی نیویگیشن یا اسکرین لاجک
-                // مثال کے طور پر جہاں مووی میکر اور میڈیا جن اسکرین کال ہو رہی ہیں:
                 
                 // --- MovieMakerScreen Call ---
                 MovieMakerScreen(
@@ -31,9 +30,10 @@ class MainActivity : ComponentActivity() {
                     userCoins = 100,
                     onBack = { finish() },
                     onBuildMovie = { script, duration, bgm ->
-                        // یہاں duration کو محفوظ طریقے سے Int میں کاسٹ کیا گیا ہے
-                        val safeDuration = (duration as? Number)?.toInt() ?: duration.toString().toDoubleOrNull()?.toInt() ?: 10
-                        // آگے کا لاجक جو آپ کا ماڈیول استعمال کرتا ہے
+                        // یہاں duration اب براہ راست Int ہے، اس لیے اسے محفوظ طریقے سے استعمال کیا جا رہا ہے
+                        val safeDuration = duration
+                        // اگر آپ کا viewModel یہاں موجود ہے تو آپ اس طرح کال کر سکتے ہیں:
+                        // viewModel.buildMovieProject(script, safeDuration, bgm)
                     }
                 )
                 
