@@ -1,9 +1,10 @@
 package com.example.ui.screens
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,11 +24,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -57,7 +62,6 @@ import com.example.ui.theme.LuminaBorder
 import com.example.ui.theme.LuminaCardBg
 import com.example.ui.theme.LuminaCyan
 import com.example.ui.theme.LuminaGold
-import com.example.ui.theme.LuminaPink
 import com.example.ui.theme.LuminaPurple
 import com.example.ui.theme.LuminaSurface
 import com.example.ui.theme.LuminaTextMuted
@@ -191,28 +195,51 @@ fun ImageGenScreen(
                         }
                     }
 
-                    OutlinedTextField(
-                        value = prompt,
-                        onValueChange = { prompt = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(84.dp)
-                            .testTag("image_prompt_input"),
-                        placeholder = {
-                            Text(
-                                "Describe characters, environment, neon lighting and composition...",
-                                color = LuminaTextMuted,
-                                fontSize = 10.sp
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedTextField(
+                            value = prompt,
+                            onValueChange = { prompt = it },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(84.dp)
+                                .testTag("image_prompt_input"),
+                            placeholder = {
+                                Text(
+                                    "Describe characters, environment, neon lighting and composition...",
+                                    color = LuminaTextMuted,
+                                    fontSize = 10.sp
+                                )
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = LuminaCyan,
+                                unfocusedBorderColor = LuminaBorder,
+                                focusedTextColor = Color.White,
+                                unfocusedTextColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(6.dp))
+
+                        // Upload Image Reference Button
+                        IconButton(
+                            onClick = { /* Simulated Upload Action */ },
+                            modifier = Modifier
+                                .size(42.dp)
+                                .background(LuminaSurface, shape = RoundedCornerShape(8.dp))
+                                .border(1.dp, LuminaCyan, RoundedCornerShape(8.dp))
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AddPhotoAlternate,
+                                contentDescription = "Upload Reference",
+                                tint = LuminaCyan,
+                                modifier = Modifier.size(20.dp)
                             )
-                        },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = LuminaCyan,
-                            unfocusedBorderColor = LuminaBorder,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    )
+                        }
+                    }
 
                     // Styles
                     Text(
@@ -348,17 +375,24 @@ fun ImageGenScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImageArtworkCard(
     image: ImageGenItem,
     modifier: Modifier = Modifier
 ) {
+    var showMenu by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(10.dp))
             .background(LuminaCardBg)
             .border(1.dp, LuminaBorder, RoundedCornerShape(10.dp))
+            .combinedClickable(
+                onClick = { /* Card Normal Click */ },
+                onLongClick = { showMenu = true } // Long press menu trigger
+            )
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
@@ -417,6 +451,34 @@ fun ImageArtworkCard(
                     )
                 }
             }
+
+            // Long Press Popup Menu
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false },
+                modifier = Modifier.background(LuminaSurface)
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Copy Prompt", color = Color.White, fontSize = 12.sp) },
+                    onClick = { showMenu = false },
+                    leadingIcon = { Icon(Icons.Default.ContentCopy, contentDescription = null, tint = LuminaCyan) }
+                )
+                DropdownMenuItem(
+                    text = { Text("Download Artwork", color = Color.White, fontSize = 12.sp) },
+                    onClick = { showMenu = false },
+                    leadingIcon = { Icon(Icons.Default.Download, contentDescription = null, tint = LuminaCyan) }
+                )
+                DropdownMenuItem(
+                    text = { Text("Share Artwork", color = Color.White, fontSize = 12.sp) },
+                    onClick = { showMenu = false },
+                    leadingIcon = { Icon(Icons.Default.Share, contentDescription = null, tint = LuminaPurple) }
+                )
+                DropdownMenuItem(
+                    text = { Text("Delete Artwork", color = Color.Red, fontSize = 12.sp) },
+                    onClick = { showMenu = false },
+                    leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null, tint = Color.Red) }
+                )
+            }
         }
 
         // Prompt & Action buttons
@@ -436,7 +498,7 @@ fun ImageArtworkCard(
 
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 IconButton(
-                    onClick = { /* Simulated download */ },
+                    onClick = { /* Download Action */ },
                     modifier = Modifier.size(24.dp)
                 ) {
                     Icon(
@@ -447,7 +509,7 @@ fun ImageArtworkCard(
                     )
                 }
                 IconButton(
-                    onClick = { /* Simulated copy */ },
+                    onClick = { /* Copy Prompt Action */ },
                     modifier = Modifier.size(24.dp)
                 ) {
                     Icon(
