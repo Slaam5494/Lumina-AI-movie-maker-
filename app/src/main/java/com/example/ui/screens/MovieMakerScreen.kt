@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
                     progress = 0f,
                     userCoins = 100,
                     onBack = { finish() },
-                    onBuildMovie = { script, duration, bgm ->
+                        onBuildMovie: (script: String, duration: Int, bgm: String) -> Unit = { _, _, _ -> }
                         // یہاں duration اب براہ راست Int ہے، اس لیے اسے محفوظ طریقے سے استعمال کیا جا رہا ہے
                         val safeDuration = duration
                         // اگر آپ کا viewModel یہاں موجود ہے تو آپ اس طرح کال کر سکتے ہیں:
