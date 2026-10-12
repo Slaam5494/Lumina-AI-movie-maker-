@@ -104,20 +104,7 @@ class MainActivity : ComponentActivity() {
                         "friends_hub" -> {
                             FriendsHubScreen(
                                 coinBalance = userCoins,
-                                onBack = { currentScreen = "dashboard" },
-                                onAddFriend = { userCoins += 3 },
-                                onShareApp = { userCoins += 5 },
-                                onOpenWhatsApp = { /* WhatsApp open logic */ },
-                                onWatchAd = { userCoins += 10 },
-                                onSendDirectMessage = { /* Direct message logic */ },
-                                onSaveStatus = { /* Save status logic */ },
-                                onCloseChat = { /* Close chat logic */ },
-                                onToggleSpeaker = { /* Toggle speaker logic */ },
-                                onOpenChat = { friend, isOnline -> /* Fixed: accepting parameters correctly */ },
-                                onEndCall = { /* End call logic */ },
-                                onToggleMute = { /* Toggle mute logic */ },
-                                onOpenStore = { /* Store open logic */ },
-                                onStartCall = { /* Start call logic */ }
+                                onBack = { currentScreen = "dashboard" }
                             )
                         }
                         else -> {
