@@ -11,6 +11,7 @@ import com.example.ui.screens.DashboardScreen
 import com.example.ui.screens.ImageGenScreen
 import com.example.ui.screens.MovieMakerScreen
 import com.example.ui.screens.VideoGenScreen
+import com.example.ui.screens.FriendsHubScreen
 import com.example.ui.theme.LuminaTheme
 import com.example.ui.theme.LuminaBackground
 import com.example.data.model.ModuleType
@@ -27,24 +28,23 @@ class MainActivity : ComponentActivity() {
                     var currentScreen by remember { mutableStateOf("dashboard") }
                     var userCoins by remember { mutableIntStateOf(100) }
                     var hasUsedDailyFreeVideo by remember { mutableStateOf(false) }
-                    
-                    // Daily Free Images State (روزانہ 3 تصاویر مفت)
                     var remainingFreeImages by remember { mutableIntStateOf(3) }
 
+                    // Safety handling so app never crashes on navigation mismatch
                     when (currentScreen) {
                         "dashboard" -> {
                             DashboardScreen(
                                 coinBalance = userCoins.toDouble(),
-                                onOpenStore = { /* Store/Coin shop logic */ },
+                                onOpenStore = { /* Store logic */ },
                                 onModuleSelected = { module ->
-                                    when (module) {
-                                        ModuleType.MOVIE_MAKER -> currentScreen = "movie_maker"
-                                        ModuleType.MEDIA_GEN -> currentScreen = "video_gen"
-                                        ModuleType.AI_CHAT -> { /* AI Chat */ }
-                                        ModuleType.PROMPT_STUDIO -> { /* Prompt Studio */ }
-                                        ModuleType.FRIENDS_HUB -> currentScreen = "friends_hub"
-                                        ModuleType.SETTINGS -> { /* Settings */ }
-                                        ModuleType.DASHBOARD -> currentScreen = "dashboard" // تمام برانچز مکمل کر دی گئی ہیں
+                                    currentScreen = when (module) {
+                                        ModuleType.MOVIE_MAKER -> "movie_maker"
+                                        ModuleType.MEDIA_GEN -> "video_gen"
+                                        ModuleType.AI_CHAT -> "dashboard"
+                                        ModuleType.PROMPT_STUDIO -> "dashboard"
+                                        ModuleType.FRIENDS_HUB -> "friends_hub"
+                                        ModuleType.SETTINGS -> "dashboard"
+                                        ModuleType.DASHBOARD -> "dashboard"
                                     }
                                 },
                                 onWatchAd = {
@@ -95,20 +95,26 @@ class MainActivity : ComponentActivity() {
                                 userCoins = userCoins.toDouble(),
                                 onBack = { currentScreen = "dashboard" },
                                 onGenerate = { prompt, style, ratio, duration, motion ->
-                                    // 5 سیکنڈ یا اس سے کم کی فری ویڈیو کا لاجک
+                                    // 5s free video logic
                                 },
                                 onRedirectToMovieMaker = { script ->
                                     currentScreen = "movie_maker"
                                 }
                             )
                         }
+                        "friends_hub" -> {
+                            FriendsHubScreen(
+                                coinBalance = userCoins,
+                                onBack = { currentScreen = "dashboard" },
+                                onAddFriend = { userCoins += 3 },
+                                onShareApp = { userCoins += 5 }
+                            )
+                        }
                         else -> {
                             DashboardScreen(
                                 coinBalance = userCoins.toDouble(),
                                 onOpenStore = {},
-                                onModuleSelected = { module ->
-                                    if (module == ModuleType.MOVIE_MAKER) currentScreen = "movie_maker"
-                                },
+                                onModuleSelected = { currentScreen = "dashboard" },
                                 onWatchAd = {}
                             )
                         }
