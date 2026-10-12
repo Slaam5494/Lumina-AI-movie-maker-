@@ -1,8 +1,7 @@
-
 package com.example.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -211,54 +210,3 @@ fun FabricationScreen(
                 isActive = selectedTool == "rightangle",
                 onClick = { selectedTool = "rightangle" }
             )
-        }
-
-        // Bottom Ad Banner Slot
-        AdBannerBox(label = "BOTTOM AD BANNER")
-    }
-}
-
-@Composable
-fun FabricationToolButton(
-    title: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    isActive: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(if (isActive) LuminaCyan.copy(alpha = 0.25f) else Color.Transparent)
-            .border(1.dp, if (isActive) LuminaCyan else LuminaBorder.copy(alpha = 0.4f), RoundedCornerShape(4.dp))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 8.dp, vertical = 6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(imageVector = icon, contentDescription = title, tint = LuminaCyan, modifier = Modifier.size(14.dp))
-        Spacer(modifier = Modifier.height(2.dp))
-        Text(text = title, color = if (isActive) LuminaCyan else LuminaTextSecondary, fontSize = 6.sp, fontWeight = FontWeight.Bold)
-    }
-}
-
-@Composable
-fun AdBannerBox(label: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(LuminaSurface.copy(alpha = 0.4f))
-            .border(BorderStroke(1.dp, LuminaBorder.copy(alpha = 0.3f)), RoundedCornerShape(4.dp))
-            .padding(2.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "--- ADVERTISEMENT SLOT ---", color = LuminaTextMuted, fontSize = 4.5.sp)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(20.dp)
-                .background(LuminaSurfaceVariant, RoundedCornerShape(2.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "[ $label ]", color = LuminaPurple, fontSize = 6.sp, fontWeight = FontWeight.Bold)
-        }
-    }
-}
