@@ -1,6 +1,5 @@
 package com.example.ui.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -79,13 +78,13 @@ fun VideoGenScreen(
     userCoins: Double,
     onBack: () -> Unit,
     onGenerate: (prompt: String, style: String, ratio: String, duration: Int, motion: String) -> Unit,
-    onRedirectToMovieMaker: (script: String) -> Unit, // 5 سیکنڈ سے بڑی ویڈیو کے لیے مووی میکر پر بھیجنے کا فنکشن
+    onRedirectToMovieMaker: (script: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var prompt by remember { mutableStateOf("Futuristic neon hypercar driving through a rainy holographic metropolis") }
     var selectedStyle by remember { mutableStateOf("Cinematic Matrix") }
     var selectedRatio by remember { mutableStateOf("16:9") }
-    var selectedDuration by remember { mutableIntStateOf(5) // Default 5 seconds free TikTok style }
+    var selectedDuration by remember { mutableIntStateOf(5) }
     var selectedMotion by remember { mutableStateOf("Orbit 360") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -198,7 +197,6 @@ fun VideoGenScreen(
                         shape = RoundedCornerShape(8.dp)
                     )
 
-                    // Style selector
                     Text(
                         text = "FX MOTION STYLE",
                         color = LuminaTextSecondary,
@@ -231,7 +229,6 @@ fun VideoGenScreen(
                         }
                     }
 
-                    // Aspect ratio & Duration (Max 5s here, >5s redirects to Movie Maker)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -311,7 +308,6 @@ fun VideoGenScreen(
                         )
                     }
 
-                    // Generate or Redirect Button
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -327,10 +323,8 @@ fun VideoGenScreen(
                                 if (prompt.isBlank()) {
                                     errorMessage = "Please enter a prompt!"
                                 } else if (selectedDuration > 5) {
-                                    // Redirect to Movie Maker Studio for longer/heavy videos
                                     onRedirectToMovieMaker(prompt)
                                 } else {
-                                    // Generate 5s Free TikTok Style Video here
                                     onGenerate(prompt, selectedStyle, selectedRatio, selectedDuration, selectedMotion)
                                 }
                             }
@@ -341,7 +335,7 @@ fun VideoGenScreen(
                         if (isGenerating) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 CircularProgressIndicator(
-                                 modifier = Modifier.size(14.dp),
+                                    modifier = Modifier.size(14.dp),
                                     color = LuminaCyan,
                                     strokeWidth = 2.dp
                                 )
