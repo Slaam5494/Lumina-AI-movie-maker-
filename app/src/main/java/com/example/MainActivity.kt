@@ -106,7 +106,9 @@ class MainActivity : ComponentActivity() {
                                 coinBalance = userCoins,
                                 onBack = { currentScreen = "dashboard" },
                                 onAddFriend = { userCoins += 3 },
-                                onShareApp = { userCoins += 5 }
+                                onShareApp = { userCoins += 5 },
+                                onOpenWhatsApp = { /* WhatsApp open logic */ },
+                                onWatchAd = { userCoins += 10 }
                             )
                         }
                         else -> {
