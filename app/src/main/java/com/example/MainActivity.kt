@@ -8,7 +8,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.example.ui.screens.DashboardScreen
-import com.example.ui.screens.FabricationScreen
 import com.example.ui.screens.ImageGenScreen
 import com.example.ui.screens.MovieMakerScreen
 import com.example.ui.screens.VideoGenScreen
@@ -40,15 +39,15 @@ class MainActivity : ComponentActivity() {
                                 onModuleSelected = { module ->
                                     when (module) {
                                         ModuleType.MOVIE_MAKER -> currentScreen = "movie_maker"
-                                        ModuleType.MEDIA_GEN -> currentScreen = "video_gen" // یا image_gen
-                                        ModuleType.AI_CHAT -> { /* AI Chat screen if available */ }
+                                        ModuleType.MEDIA_GEN -> currentScreen = "video_gen"
+                                        ModuleType.AI_CHAT -> { /* AI Chat */ }
                                         ModuleType.PROMPT_STUDIO -> { /* Prompt Studio */ }
                                         ModuleType.FRIENDS_HUB -> currentScreen = "friends_hub"
                                         ModuleType.SETTINGS -> { /* Settings */ }
+                                        ModuleType.DASHBOARD -> currentScreen = "dashboard" // تمام برانچز مکمل کر دی گئی ہیں
                                     }
                                 },
                                 onWatchAd = {
-                                    // Ad watch reward logic (+ coins)
                                     userCoins += 10
                                 }
                             )
@@ -99,7 +98,6 @@ class MainActivity : ComponentActivity() {
                                     // 5 سیکنڈ یا اس سے کم کی فری ویڈیو کا لاجک
                                 },
                                 onRedirectToMovieMaker = { script ->
-                                    // 5 سیکنڈ سے بڑی ویڈیو کے لیے مووی میکر اسکرین پر ری ڈائریکٹ کریں
                                     currentScreen = "movie_maker"
                                 }
                             )
