@@ -111,7 +111,9 @@ class MainActivity : ComponentActivity() {
                                 onWatchAd = { userCoins += 10 },
                                 onSendDirectMessage = { /* Direct message logic */ },
                                 onSaveStatus = { /* Save status logic */ },
-                                onCloseChat = { /* Close chat logic */ }
+                                onCloseChat = { /* Close chat logic */ },
+                                onToggleSpeaker = { /* Toggle speaker logic */ },
+                                onOpenChat = { /* Open chat logic */ }
                             )
                         }
                         else -> {
