@@ -167,7 +167,7 @@ fun LuminaApp(
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
                                 onBuildMovie = { script, duration, bgm ->
                                     val safeDuration = duration.toString().toDoubleOrNull()?.toInt() ?: 10
-                                    viewModel.buildMovieProject(script = script, duration = safeDuration, bgm = bgm)
+                                    viewModel.buildMovieProject(script, safeDuration, bgm)
                                 }
                             )
                         }
@@ -183,16 +183,10 @@ fun LuminaApp(
                                 isImageGenerating = isImageGenerating,
                                 userCoins = userAccount.coins,
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
-                                onGenerateVideo = { prompt, style, ratio, rawDuration, motion ->
-                                    val safeVideoDuration = rawDuration.toString().toDoubleOrNull()?.toInt() ?: 5
+                                onGenerateVideo = { prompt, style, ratio, duration, motion ->
+                                    val safeVideoDuration = duration.toString().toDoubleOrNull()?.toInt() ?: 5
                                     val safeMotion = motion.toString()
-                                    viewModel.generateVideo(
-                                        prompt = prompt,
-                                        style = style,
-                                        ratio = ratio,
-                                        duration = safeVideoDuration,
-                                        motion = safeMotion
-                                    )
+                                    viewModel.generateVideo(prompt, style, ratio, safeVideoDuration, safeMotion)
                                 },
                                 onGenerateImage = { prompt, style, ratio ->
                                     viewModel.generateImage(prompt, style, ratio)
