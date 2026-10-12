@@ -36,6 +36,8 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.VolumeUp
@@ -92,6 +94,7 @@ fun FriendsHubScreen(
     isSpeakerOn: Boolean,
     activeChatFriend: FriendItem?,
     directMessages: List<DirectMessage>,
+    userCoins: Int,
     onBack: () -> Unit,
     onOpenStore: () -> Unit,
     onStartCall: (FriendItem, Boolean) -> Unit,
@@ -104,13 +107,14 @@ fun FriendsHubScreen(
     onSaveStatus: (String) -> Unit,
     onOpenWhatsApp: (Context, String) -> Unit,
     onWatchAd: () -> Unit,
+    onAddFriend: (String) -> Unit, // नया फ्रेंड जोड़ने और +3 कॉइन देने के लिए
+    onShareApp: () -> Unit, // ऐप शेयर करने और +5 कॉइन देने के लिए
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    var selectedTab by remember { mutableIntStateOf(0) } // 0: CHATS, 1: STATUS SAVER, 2: VIP THEMES
+    var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("CHATS", "STATUS SAVER", "VIP THEMES")
 
-    // If an active call is ongoing, show the Active Call Screen
     if (activeCallFriend != null) {
         ActiveCallScreen(
             friend = activeCallFriend,
@@ -125,7 +129,6 @@ fun FriendsHubScreen(
         return
     }
 
-    // If a direct chat is active, show the Direct Chat Overlay
     if (activeChatFriend != null) {
         FriendChatOverlay(
             friend = activeChatFriend,
@@ -173,7 +176,7 @@ fun FriendsHubScreen(
                         letterSpacing = 1.sp
                     )
                     Text(
-                        text = "WhatsApp & HD Encrypted Calling (Monetized)",
+                        text = "Add Friends (+3 Coins) • Share (+5 Coins)",
                         color = LuminaTextMuted,
                         fontSize = 8.sp
                     )
@@ -183,13 +186,13 @@ fun FriendsHubScreen(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
-                    .background(LuminaGreen.copy(alpha = 0.15f))
-                    .border(1.dp, LuminaGreen, RoundedCornerShape(8.dp))
+                    .background(LuminaGold.copy(alpha = 0.15f))
+                    .border(1.dp, LuminaGold, RoundedCornerShape(8.dp))
                     .padding(horizontal = 6.dp, vertical = 3.dp)
             ) {
                 Text(
-                    text = "AR SECURE",
-                    color = LuminaGreen,
+                    text = "$userCoins Coins",
+                    color = LuminaGold,
                     fontSize = 8.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -234,7 +237,9 @@ fun FriendsHubScreen(
                 onStartCall = onStartCall,
                 onOpenWhatsApp = { phone -> onOpenWhatsApp(context, phone) },
                 onOpenStore = onOpenStore,
-                onWatchAd = onWatchAd
+                onWatchAd = onWatchAd,
+                onAddFriend = onAddFriend,
+                onShareApp = onShareApp
             )
             1 -> StatusSaverTabContent(
                 statuses = statuses,
@@ -256,59 +261,88 @@ fun ChatsTabContent(
     onOpenWhatsApp: (String) -> Unit,
     onOpenStore: () -> Unit,
     onWatchAd: () -> Unit,
+    onAddFriend: (String) -> Unit,
+    onShareApp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var searchQuery by remember { mutableStateOf("") }
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Monetize VIP Banner
+        // Add Friend & Share App Banner (Reward System)
         item {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp))
-                    .background(LuminaGold.copy(alpha = 0.1f))
-                    .border(1.dp, LuminaGold, RoundedCornerShape(8.dp))
+                    .background(LuminaSurface)
+                    .border(1.dp, LuminaGreen, RoundedCornerShape(8.dp))
                     .padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
-                    text = "★ UNLOCK VIP FRIENDS HUB & 9D VIDEO CALLS ★",
-                    color = LuminaGold,
+                    text = "ADD FRIEND (+3 COINS) OR SHARE APP (+5 COINS)",
+                    color = LuminaGreen,
                     fontSize = 8.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(44.dp),
+                        placeholder = { Text("Enter Username / Phone", color = LuminaTextMuted, fontSize = 8.sp) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = LuminaGreen,
+                            unfocusedBorderColor = LuminaBorder,
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(6.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Brush.horizontalGradient(listOf(LuminaGold, Color(0xFFFF8C00))))
-                            .clickable { onOpenStore() }
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(LuminaGreen)
+                            .clickable(enabled = searchQuery.isNotBlank()) {
+                                onAddFriend(searchQuery)
+                                searchQuery = ""
+                            }
+                            .padding(horizontal = 10.dp, vertical = 10.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "GET VIP PASS ($0.99)",
-                            color = Color.Black,
-                            fontSize = 7.5.sp,
-                            fontWeight = FontWeight.Black
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(imageVector = Icons.Default.PersonAdd, contentDescription = null, tint = Color.Black, modifier = Modifier.size(12.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(text = "ADD", color = Color.Black, fontSize = 8.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(LuminaCyan.copy(alpha = 0.15f))
-                            .border(1.dp, LuminaCyan, RoundedCornerShape(12.dp))
-                            .clickable { onWatchAd() }
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = "WATCH AD (+10 COINS)",
-                            color = LuminaCyan,
-                            fontSize = 7.5.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                }
+
+                // Share Button for +5 Coins
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(LuminaCyan.copy(alpha = 0.2f))
+                        .border(1.dp, LuminaCyan, RoundedCornerShape(6.dp))
+                        .clickable { onShareApp() }
+                        .padding(vertical = 6.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(imageVector = Icons.Default.Share, contentDescription = null, tint = LuminaCyan, modifier = Modifier.size(12.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(text = "SHARE APP WITH FRIENDS (+5 COINS)", color = LuminaCyan, fontSize = 8.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -346,7 +380,6 @@ fun FriendListItem(
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Avatar with Online dot
         Box(contentAlignment = Alignment.BottomEnd) {
             AsyncImage(
                 model = friend.avatarUrl,
@@ -370,7 +403,6 @@ fun FriendListItem(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // Info
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = friend.name,
@@ -391,9 +423,7 @@ fun FriendListItem(
             )
         }
 
-        // Actions
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            // Voice Call
             Box(
                 modifier = Modifier
                     .size(24.dp)
@@ -403,15 +433,9 @@ fun FriendListItem(
                     .clickable { onVoiceCall() },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Call,
-                    contentDescription = "Voice Call",
-                    tint = LuminaCyan,
-                    modifier = Modifier.size(12.dp)
-                )
+                Icon(imageVector = Icons.Default.Call, contentDescription = "Voice Call", tint = LuminaCyan, modifier = Modifier.size(12.dp))
             }
 
-            // Video Call
             Box(
                 modifier = Modifier
                     .size(24.dp)
@@ -421,15 +445,9 @@ fun FriendListItem(
                     .clickable { onVideoCall() },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Videocam,
-                    contentDescription = "Video Call",
-                    tint = LuminaGreen,
-                    modifier = Modifier.size(12.dp)
-                )
+                Icon(imageVector = Icons.Default.Videocam, contentDescription = "Video Call", tint = LuminaGreen, modifier = Modifier.size(12.dp))
             }
 
-            // WhatsApp link
             Box(
                 modifier = Modifier
                     .size(24.dp)
@@ -439,12 +457,7 @@ fun FriendListItem(
                     .clickable { onWhatsApp() },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Chat,
-                    contentDescription = "WhatsApp",
-                    tint = LuminaGreen,
-                    modifier = Modifier.size(12.dp)
-                )
+                Icon(imageVector = Icons.AutoMirrored.Filled.Chat, contentDescription = "WhatsApp", tint = LuminaGreen, modifier = Modifier.size(12.dp))
             }
         }
     }
@@ -461,26 +474,6 @@ fun StatusSaverTabContent(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(LuminaCyan.copy(alpha = 0.1f))
-                    .border(1.dp, LuminaCyan, RoundedCornerShape(8.dp))
-                    .clickable { onWatchAd() }
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "WATCH 1 SPONSOR AD TO UNLOCK ULTRA 4K STATUS SAVER",
-                    color = LuminaCyan,
-                    fontSize = 8.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-
         items(statuses) { status ->
             Row(
                 modifier = Modifier
@@ -635,7 +628,6 @@ fun ActiveCallScreen(
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
-        // Holographic simulated background if video call
         if (isVideo) {
             Image(
                 painter = painterResource(id = R.drawable.bg_video_gen),
@@ -651,7 +643,6 @@ fun ActiveCallScreen(
             verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxSize()
         ) {
-            // Call status tag
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
@@ -667,7 +658,6 @@ fun ActiveCallScreen(
                 )
             }
 
-            // Friend Avatar and Name
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
                     modifier = Modifier
@@ -703,7 +693,6 @@ fun ActiveCallScreen(
                 )
             }
 
-            // Call Controls Row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -711,7 +700,6 @@ fun ActiveCallScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Mute
                 Box(
                     modifier = Modifier
                         .size(48.dp)
@@ -729,7 +717,6 @@ fun ActiveCallScreen(
                     )
                 }
 
-                // End Call (Big Red)
                 Box(
                     modifier = Modifier
                         .size(56.dp)
@@ -747,7 +734,6 @@ fun ActiveCallScreen(
                     )
                 }
 
-                // Speaker
                 Box(
                     modifier = Modifier
                         .size(48.dp)
@@ -786,7 +772,6 @@ fun FriendChatOverlay(
             .background(LuminaBackground)
             .padding(10.dp)
     ) {
-        // Chat Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -796,79 +781,36 @@ fun FriendChatOverlay(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onClose) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = LuminaGreen
-                    )
+                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = LuminaGreen)
                 }
                 Spacer(modifier = Modifier.width(4.dp))
                 AsyncImage(
                     model = friend.avatarUrl,
                     contentDescription = friend.name,
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(CircleShape)
-                        .border(1.dp, LuminaGreen, CircleShape)
+                    modifier = Modifier.size(28.dp).clip(CircleShape).border(1.dp, LuminaGreen, CircleShape)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Column {
-                    Text(
-                        text = friend.name,
-                        color = Color.White,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = friend.status,
-                        color = LuminaGreen,
-                        fontSize = 7.sp
-                    )
+                    Text(text = friend.name, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text(text = friend.status, color = LuminaGreen, fontSize = 7.sp)
                 }
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                IconButton(
-                    onClick = { onStartCall(false) },
-                    modifier = Modifier.size(28.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Call,
-                        contentDescription = "Call",
-                        tint = LuminaCyan,
-                        modifier = Modifier.size(16.dp)
-                    )
+                IconButton(onClick = { onStartCall(false) }, modifier = Modifier.size(28.dp)) {
+                    Icon(imageVector = Icons.Default.Call, contentDescription = "Call", tint = LuminaCyan, modifier = Modifier.size(16.dp))
                 }
-                IconButton(
-                    onClick = { onStartCall(true) },
-                    modifier = Modifier.size(28.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Videocam,
-                        contentDescription = "Video Call",
-                        tint = LuminaGreen,
-                        modifier = Modifier.size(16.dp)
-                    )
+                IconButton(onClick = { onStartCall(true) }, modifier = Modifier.size(28.dp)) {
+                    Icon(imageVector = Icons.Default.Videocam, contentDescription = "Video Call", tint = LuminaGreen, modifier = Modifier.size(16.dp))
                 }
-                IconButton(
-                    onClick = onOpenWhatsApp,
-                    modifier = Modifier.size(28.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Chat,
-                        contentDescription = "WhatsApp",
-                        tint = LuminaGreen,
-                        modifier = Modifier.size(16.dp)
-                    )
+                IconButton(onClick = onOpenWhatsApp, modifier = Modifier.size(28.dp)) {
+                    Icon(imageVector = Icons.AutoMirrored.Filled.Chat, contentDescription = "WhatsApp", tint = LuminaGreen, modifier = Modifier.size(16.dp))
                 }
             }
         }
 
-        // Messages
         LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
+            modifier = Modifier.weight(1f).fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             items(messages) { msg ->
@@ -880,52 +822,29 @@ fun FriendChatOverlay(
                         modifier = Modifier
                             .fillMaxWidth(0.75f)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(
-                                if (msg.isMe) LuminaGreen.copy(alpha = 0.25f)
-                                else LuminaSurface
-                            )
-                            .border(
-                                1.dp,
-                                if (msg.isMe) LuminaGreen else LuminaBorder,
-                                RoundedCornerShape(8.dp)
-                            )
+                            .background(if (msg.isMe) LuminaGreen.copy(alpha = 0.25f) else LuminaSurface)
+                            .border(1.dp, if (msg.isMe) LuminaGreen else LuminaBorder, RoundedCornerShape(8.dp))
                             .padding(8.dp)
                     ) {
                         Column {
-                            Text(
-                                text = msg.text,
-                                color = Color.White,
-                                fontSize = 8.5.sp
-                            )
+                            Text(text = msg.text, color = Color.White, fontSize = 8.5.sp)
                             Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = msg.time,
-                                color = LuminaTextMuted,
-                                fontSize = 6.5.sp,
-                                modifier = Modifier.align(Alignment.End)
-                            )
+                            Text(text = msg.time, color = LuminaTextMuted, fontSize = 6.5.sp, modifier = Modifier.align(Alignment.End))
                         }
                     }
                 }
             }
         }
 
-        // Input
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 6.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
                 value = text,
                 onValueChange = { text = it },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(46.dp),
-                placeholder = {
-                    Text("Type encrypted direct message...", color = LuminaTextMuted, fontSize = 8.5.sp)
-                },
+                modifier = Modifier.weight(1f).height(46.dp),
+                placeholder = { Text("Type encrypted direct message...", color = LuminaTextMuted, fontSize = 8.5.sp) },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = LuminaGreen,
                     unfocusedBorderColor = LuminaBorder,
@@ -949,12 +868,7 @@ fun FriendChatOverlay(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Send,
-                    contentDescription = "Send",
-                    tint = Color.Black,
-                    modifier = Modifier.size(16.dp)
-                )
+                Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "Send", tint = Color.Black, modifier = Modifier.size(16.dp))
             }
         }
     }
