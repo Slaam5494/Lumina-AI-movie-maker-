@@ -185,7 +185,7 @@ fun LuminaApp(
                                 onBack = { viewModel.navigateTo(ModuleType.DASHBOARD) },
                                 onGenerateVideo = { prompt, style, ratio, duration, motion ->
                                     val safeVideoDuration = duration.toString().toDoubleOrNull()?.toInt() ?: 5
-                                    val safeMotion = motion.toString().toDoubleOrNull()?.toInt() ?: 1
+                                    val safeMotion = motion.toString()
                                     viewModel.generateVideo(prompt, style, ratio, safeVideoDuration, safeMotion)
                                 },
                                 onGenerateImage = { prompt, style, ratio ->
