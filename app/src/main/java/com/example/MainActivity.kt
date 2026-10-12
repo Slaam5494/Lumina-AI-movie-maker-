@@ -101,7 +101,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
-                        "friends_hub" -> {
+                      "friends_hub" -> {
                             FriendsHubScreen(
                                 coinBalance = userCoins,
                                 onBack = { currentScreen = "dashboard" },
@@ -113,13 +113,14 @@ class MainActivity : ComponentActivity() {
                                 onSaveStatus = { /* Save status logic */ },
                                 onCloseChat = { /* Close chat logic */ },
                                 onToggleSpeaker = { /* Toggle speaker logic */ },
-                                onOpenChat = { /* Open chat logic */ },
+                                onOpenChat = { friend, isOnline -> /* Open chat logic */ },
                                 onEndCall = { /* End call logic */ },
                                 onToggleMute = { /* Toggle mute logic */ },
                                 onOpenStore = { /* Store open logic */ },
                                 onStartCall = { /* Start call logic */ }
                             )
                         }
+
                         else -> {
                             DashboardScreen(
                                 coinBalance = userCoins.toDouble(),
