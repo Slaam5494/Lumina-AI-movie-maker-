@@ -23,10 +23,12 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = LuminaBackground
                 ) {
-                    // Navigation and Coin State System
                     var currentScreen by remember { mutableStateOf("dashboard") }
-                    var userCoins by remember { mutableIntStateOf(100) } // Integer coins for credit system
-                    var hasUsedDailyFreeVideo by remember { mutableStateOf(false) } // Daily free 5-10 sec video status
+                    var userCoins by remember { mutableIntStateOf(100) }
+                    var hasUsedDailyFreeVideo by remember { mutableStateOf(false) }
+                    
+                    // Daily Free Images State (روزانہ 3 تصاویر مفت)
+                    var remainingFreeImages by remember { mutableIntStateOf(3) }
 
                     when (currentScreen) {
                         "dashboard" -> {
@@ -44,13 +46,10 @@ class MainActivity : ComponentActivity() {
                                 onBack = { currentScreen = "dashboard" },
                                 onBuildMovie = { script, duration, bgm, requiredCoins ->
                                     if (requiredCoins == 0) {
-                                        // Used Daily Free Slot (5-10 Seconds)
                                         hasUsedDailyFreeVideo = true
                                     } else if (userCoins >= requiredCoins) {
-                                        // Deduct required coins
                                         userCoins -= requiredCoins
                                     }
-                                    // Movie generation process triggered here
                                 }
                             )
                         }
@@ -59,9 +58,17 @@ class MainActivity : ComponentActivity() {
                                 imageList = emptyList(),
                                 isGenerating = false,
                                 userCoins = userCoins.toDouble(),
+                                remainingFreeImages = remainingFreeImages,
                                 onBack = { currentScreen = "dashboard" },
-                                onGenerate = { prompt, style, ratio ->
-                                    // Handle Image Generation logic
+                                onGenerate = { prompt, style, ratio, requiredCoins ->
+                                    if (requiredCoins == 0) {
+                                        if (remainingFreeImages > 0) {
+                                            remainingFreeImages--
+                                        }
+                                    } else if (userCoins >= requiredCoins) {
+                                        userCoins -= requiredCoins
+                                    }
+                                    // Image Generation logic goes here
                                 }
                             )
                         }
