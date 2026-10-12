@@ -1,6 +1,5 @@
 package com.example.ui.screens
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -80,13 +79,15 @@ fun VideoGenScreen(
     userCoins: Double,
     onBack: () -> Unit,
     onGenerate: (prompt: String, style: String, ratio: String, duration: Int, motion: String) -> Unit,
+    onRedirectToMovieMaker: (script: String) -> Unit, // 5 سیکنڈ سے بڑی ویڈیو کے لیے مووی میکر پر بھیجنے کا فنکشن
     modifier: Modifier = Modifier
 ) {
     var prompt by remember { mutableStateOf("Futuristic neon hypercar driving through a rainy holographic metropolis") }
     var selectedStyle by remember { mutableStateOf("Cinematic Matrix") }
     var selectedRatio by remember { mutableStateOf("16:9") }
-    var selectedDuration by remember { mutableIntStateOf(10) }
+    var selectedDuration by remember { mutableIntStateOf(5) // Default 5 seconds free TikTok style }
     var selectedMotion by remember { mutableStateOf("Orbit 360") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val styles = listOf("Cinematic Matrix", "Hologram 9D", "Cyberpunk", "Anime 4K", "Unreal 5")
     val ratios = listOf("16:9", "9:16", "1:1")
@@ -120,14 +121,14 @@ fun VideoGenScreen(
                 Spacer(modifier = Modifier.width(4.dp))
                 Column {
                     Text(
-                        text = "VIDEO GEN",
+                        text = "VIDEO GEN (TIKTOK STYLE)",
                         color = LuminaCyan,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Black,
                         letterSpacing = 1.sp
                     )
                     Text(
-                        text = "Compact FX Screen • 9D Engine",
+                        text = "Max 5s Free • Longer goes to Movie Studio",
                         color = LuminaTextMuted,
                         fontSize = 8.sp
                     )
@@ -154,7 +155,6 @@ fun VideoGenScreen(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Prompt input section
             item {
                 Column(
                     modifier = Modifier
@@ -174,7 +174,10 @@ fun VideoGenScreen(
 
                     OutlinedTextField(
                         value = prompt,
-                        onValueChange = { prompt = it },
+                        onValueChange = { 
+                            prompt = it
+                            errorMessage = null
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(84.dp)
@@ -194,36 +197,6 @@ fun VideoGenScreen(
                         ),
                         shape = RoundedCornerShape(8.dp)
                     )
-
-                    // Quick suggestion pills
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        listOf(
-                            "Cyberpunk Rain",
-                            "Quantum Singularity",
-                            "Hologram Avatar",
-                            "Orbital Space Station"
-                        ).forEach { suggestion ->
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(6.dp))
-                                    .background(LuminaCyan.copy(alpha = 0.1f))
-                                    .border(1.dp, LuminaBorder, RoundedCornerShape(6.dp))
-                                    .clickable { prompt = "$suggestion with volumetric lighting and dynamic motion" }
-                                    .padding(horizontal = 6.dp, vertical = 3.dp)
-                            ) {
-                                Text(
-                                    text = suggestion,
-                                    color = LuminaCyan,
-                                    fontSize = 8.sp
-                                )
-                            }
-                        }
-                    }
 
                     // Style selector
                     Text(
@@ -258,12 +231,11 @@ fun VideoGenScreen(
                         }
                     }
 
-                    // Aspect ratio & Duration
+                    // Aspect ratio & Duration (Max 5s here, >5s redirects to Movie Maker)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        // Ratio
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = "ASPECT RATIO",
@@ -293,10 +265,9 @@ fun VideoGenScreen(
                             }
                         }
 
-                        // Duration
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "DURATION",
+                                text = "DURATION (FREE: 5s)",
                                 color = LuminaTextSecondary,
                                 fontSize = 8.sp,
                                 fontWeight = FontWeight.Bold
@@ -309,7 +280,14 @@ fun VideoGenScreen(
                                             .clip(RoundedCornerShape(4.dp))
                                             .background(if (isSelected) LuminaPink else LuminaSurface)
                                             .border(1.dp, if (isSelected) LuminaPink else LuminaBorder, RoundedCornerShape(4.dp))
-                                            .clickable { selectedDuration = d }
+                                            .clickable { 
+                                                selectedDuration = d
+                                                if (d > 5) {
+                                                    errorMessage = "Duration > 5s will open AI Movie Studio (Paid/Coins)"
+                                                } else {
+                                                    errorMessage = null
+                                                }
+                                            }
                                             .padding(horizontal = 6.dp, vertical = 3.dp)
                                     ) {
                                         Text(
@@ -324,39 +302,16 @@ fun VideoGenScreen(
                         }
                     }
 
-                    // Camera motion
-                    Text(
-                        text = "CAMERA TRAJECTORY",
-                        color = LuminaTextSecondary,
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        motions.forEach { m ->
-                            val isSelected = selectedMotion == m
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(4.dp))
-                                    .background(if (isSelected) LuminaCyan.copy(alpha = 0.2f) else LuminaSurface)
-                                    .border(1.dp, if (isSelected) LuminaCyan else LuminaBorder, RoundedCornerShape(4.dp))
-                                    .clickable { selectedMotion = m }
-                                    .padding(horizontal = 6.dp, vertical = 3.dp)
-                            ) {
-                                Text(
-                                    text = m,
-                                    color = if (isSelected) LuminaCyan else LuminaTextSecondary,
-                                    fontSize = 8.sp
-                                )
-                            }
-                        }
+                    if (errorMessage != null) {
+                        Text(
+                            text = errorMessage!!,
+                            color = LuminaGold,
+                            fontSize = 8.5.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
 
-                    // Generate Button
+                    // Generate or Redirect Button
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -364,11 +319,20 @@ fun VideoGenScreen(
                             .background(
                                 Brush.horizontalGradient(
                                     if (isGenerating) listOf(LuminaSurface, LuminaSurface)
+                                    else if (selectedDuration > 5) listOf(LuminaGold, LuminaPurple)
                                     else listOf(LuminaCyan, LuminaPurple)
                                 )
                             )
                             .clickable(enabled = !isGenerating) {
-                                onGenerate(prompt, selectedStyle, selectedRatio, selectedDuration, selectedMotion)
+                                if (prompt.isBlank()) {
+                                    errorMessage = "Please enter a prompt!"
+                                } else if (selectedDuration > 5) {
+                                    // Redirect to Movie Maker Studio for longer/heavy videos
+                                    onRedirectToMovieMaker(prompt)
+                                } else {
+                                    // Generate 5s Free TikTok Style Video here
+                                    onGenerate(prompt, selectedStyle, selectedRatio, selectedDuration, selectedMotion)
+                                }
                             }
                             .padding(vertical = 10.dp)
                             .testTag("generate_video_button"),
@@ -377,13 +341,13 @@ fun VideoGenScreen(
                         if (isGenerating) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(14.dp),
+                                 modifier = Modifier.size(14.dp),
                                     color = LuminaCyan,
                                     strokeWidth = 2.dp
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "SYNTHESIZING 9D FRAMES (${(progress * 100).toInt()}%)...",
+                                    text = "SYNTHESIZING TIKTOK FRAME (${(progress * 100).toInt()}%)...",
                                     color = LuminaCyan,
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold
@@ -392,14 +356,14 @@ fun VideoGenScreen(
                         } else {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
-                                    imageVector = Icons.Default.Videocam,
+                                    imageVector = if (selectedDuration > 5) Icons.Default.Movie else Icons.Default.Videocam,
                                     contentDescription = null,
                                     tint = Color.Black,
                                     modifier = Modifier.size(14.dp)
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
-                                    text = "RENDER VIDEO (COST: 10 COINS)",
+                                    text = if (selectedDuration > 5) "OPEN IN AI MOVIE STUDIO (COIN SYSTEM)" else "RENDER FREE 5s TIKTOK VIDEO",
                                     color = Color.Black,
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Black,
@@ -423,7 +387,6 @@ fun VideoGenScreen(
                 }
             }
 
-            // Generated Videos Section
             item {
                 Text(
                     text = "RENDERED 9D SEQUENCES (${videoList.size})",
@@ -458,7 +421,6 @@ fun VideoPlayerCard(
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        // Video Preview Screen
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -475,7 +437,6 @@ fun VideoPlayerCard(
                 alpha = if (isPlaying) 0.95f else 0.7f
             )
 
-            // Play/Pause overlay
             Box(
                 modifier = Modifier
                     .size(36.dp)
@@ -493,7 +454,6 @@ fun VideoPlayerCard(
                 )
             }
 
-            // Top Badges
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -533,7 +493,6 @@ fun VideoPlayerCard(
             }
         }
 
-        // Timeline Scrubber
         Slider(
             value = currentScrub,
             onValueChange = { currentScrub = it },
@@ -547,7 +506,6 @@ fun VideoPlayerCard(
             )
         )
 
-        // Metadata & Actions
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
