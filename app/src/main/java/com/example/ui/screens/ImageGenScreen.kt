@@ -73,16 +73,21 @@ fun ImageGenScreen(
     imageList: List<ImageGenItem>,
     isGenerating: Boolean,
     userCoins: Double,
+    remainingFreeImages: Int, // روزانہ کی بچی ہوئی فری تصاویر (تعداد: 3)
     onBack: () -> Unit,
-    onGenerate: (prompt: String, style: String, ratio: String) -> Unit,
+    onGenerate: (prompt: String, style: String, ratio: String, requiredCoins: Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var prompt by remember { mutableStateOf("Cybernetic avatar in quantum cyberspace with luminous neon infinity halo") }
     var selectedStyle by remember { mutableStateOf("9D Cyberpunk") }
     var selectedRatio by remember { mutableStateOf("1:1") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val styles = listOf("9D Cyberpunk", "Neon Hologram", "Photoreal AR", "Synthwave", "Sci-Fi Anime")
     val ratios = listOf("1:1", "16:9", "9:16")
+
+    // اگر روزانہ کی فری لمٹ باقی ہے تو 0 کوائن، ورنہ 3 کوائنز
+    val requiredCoins = if (remainingFreeImages > 0) 0 else 3
 
     Column(
         modifier = modifier
@@ -119,7 +124,7 @@ fun ImageGenScreen(
                         letterSpacing = 1.sp
                     )
                     Text(
-                        text = "Compact Studio • Neural Diffusion",
+                        text = if (remainingFreeImages > 0) "Free Daily Quota: $remainingFreeImages left" else "Cost: 3 Coins per Image",
                         color = LuminaTextMuted,
                         fontSize = 8.sp
                     )
@@ -201,7 +206,10 @@ fun ImageGenScreen(
                     ) {
                         OutlinedTextField(
                             value = prompt,
-                            onValueChange = { prompt = it },
+                            onValueChange = { 
+                                prompt = it 
+                                errorMessage = null
+                            },
                             modifier = Modifier
                                 .weight(1f)
                                 .height(84.dp)
@@ -224,7 +232,6 @@ fun ImageGenScreen(
 
                         Spacer(modifier = Modifier.width(6.dp))
 
-                        // Upload Image Reference Button
                         IconButton(
                             onClick = { /* Simulated Upload Action */ },
                             modifier = Modifier
@@ -302,6 +309,15 @@ fun ImageGenScreen(
                         }
                     }
 
+                    if (errorMessage != null) {
+                        Text(
+                            text = errorMessage!!,
+                            color = Color.Red,
+                            fontSize = 9.sp,
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+                    }
+
                     // Generate Button
                     Box(
                         modifier = Modifier
@@ -314,7 +330,14 @@ fun ImageGenScreen(
                                 )
                             )
                             .clickable(enabled = !isGenerating) {
-                                onGenerate(prompt, selectedStyle, selectedRatio)
+                                if (prompt.isBlank()) {
+                                    errorMessage = "Please enter a prompt first!"
+                                } else if (requiredCoins > 0 && userCoins < requiredCoins) {
+                                    errorMessage = "Insufficient coins! You need $requiredCoins coins."
+                                } else {
+                                    errorMessage = null
+                                    onGenerate(prompt, selectedStyle, selectedRatio, requiredCoins)
+                                }
                             }
                             .padding(vertical = 10.dp)
                             .testTag("generate_image_button"),
@@ -345,7 +368,7 @@ fun ImageGenScreen(
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
-                                    text = "SYNTHESIZE IMAGE (COST: 5 COINS)",
+                                    text = if (remainingFreeImages > 0) "SYNTHESIZE IMAGE (FREE DAILY: $remainingFreeImages LEFT)" else "SYNTHESIZE IMAGE (COST: 3 COINS)",
                                     color = Color.Black,
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Black,
@@ -391,12 +414,11 @@ fun ImageArtworkCard(
             .border(1.dp, LuminaBorder, RoundedCornerShape(10.dp))
             .combinedClickable(
                 onClick = { /* Card Normal Click */ },
-                onLongClick = { showMenu = true } // Long press menu trigger
+                onLongClick = { showMenu = true }
             )
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        // Image Canvas
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -413,7 +435,6 @@ fun ImageArtworkCard(
                 contentScale = ContentScale.Crop
             )
 
-            // Top Badges
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -452,7 +473,6 @@ fun ImageArtworkCard(
                 }
             }
 
-            // Long Press Popup Menu
             DropdownMenu(
                 expanded = showMenu,
                 onDismissRequest = { showMenu = false },
@@ -481,7 +501,6 @@ fun ImageArtworkCard(
             }
         }
 
-        // Prompt & Action buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
