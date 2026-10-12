@@ -80,7 +80,11 @@ class MainActivity : ComponentActivity() {
                                 userCoins = userCoins.toDouble(),
                                 onBack = { currentScreen = "dashboard" },
                                 onGenerate = { prompt, style, ratio, duration, motion ->
-                                    // Handle Video Generation logic
+                                    // 5 سیکنڈ یا اس سے کم کی فری ویڈیو کا لاجک
+                                },
+                                onRedirectToMovieMaker = { script ->
+                                    // 5 سیکنڈ سے بڑی ویڈیو کے لیے مووی میکر اسکرین پر ری ڈائریکٹ کریں
+                                    currentScreen = "movie_maker"
                                 }
                             )
                         }
