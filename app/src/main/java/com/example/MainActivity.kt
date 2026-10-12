@@ -110,7 +110,8 @@ class MainActivity : ComponentActivity() {
                                 onOpenWhatsApp = { /* WhatsApp open logic */ },
                                 onWatchAd = { userCoins += 10 },
                                 onSendDirectMessage = { /* Direct message logic */ },
-                                onSaveStatus = { /* Save status logic */ }
+                                onSaveStatus = { /* Save status logic */ },
+                                onCloseChat = { /* Close chat logic */ }
                             )
                         }
                         else -> {
