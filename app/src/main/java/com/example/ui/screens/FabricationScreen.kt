@@ -36,7 +36,6 @@ fun FabricationScreen(
             .padding(6.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Top Header Bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -71,10 +70,8 @@ fun FabricationScreen(
             )
         }
 
-        // Top Ad Banner Slot
         AdBannerBox(label = "TOP AD BANNER")
 
-        // Main Viewport Box (AR View / Level View)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -90,26 +87,18 @@ fun FabricationScreen(
                         verticalArrangement = Arrangement.Center,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(0.7f)
-                                .height(6.dp)
-                                .background(Brush.horizontalGradient(listOf(LuminaCyan, LuminaPurple, LuminaCyan)), RoundedCornerShape(3.dp)),
-                            contentAlignment = Alignment.Center
+                        Surface(
+                            color = LuminaSurface,
+                            border = BorderStroke(1.dp, LuminaCyan),
+                            shape = RoundedCornerShape(4.dp)
                         ) {
-                            Surface(
-                                color = LuminaSurface,
-                                border = BorderStroke(1.dp, LuminaCyan),
-                                shape = RoundedCornerShape(4.dp)
-                            ) {
-                                Text(
-                                    text = tapeDistance,
-                                    color = LuminaCyan,
-                                    fontSize = 8.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                )
-                            }
+                            Text(
+                                text = tapeDistance,
+                                color = LuminaCyan,
+                                fontSize = 8.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
@@ -177,7 +166,6 @@ fun FabricationScreen(
             }
         }
 
-        // Mode Switching Bottom Control Panel
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -210,3 +198,53 @@ fun FabricationScreen(
                 isActive = selectedTool == "rightangle",
                 onClick = { selectedTool = "rightangle" }
             )
+        }
+
+        AdBannerBox(label = "BOTTOM AD BANNER")
+    }
+}
+
+@Composable
+fun FabricationToolButton(
+    title: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    isActive: Boolean,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .clip(RoundedCornerShape(4.dp))
+            .background(if (isActive) LuminaCyan.copy(alpha = 0.25f) else Color.Transparent)
+            .border(1.dp, if (isActive) LuminaCyan else LuminaBorder.copy(alpha = 0.4f), RoundedCornerShape(4.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(imageVector = icon, contentDescription = title, tint = LuminaCyan, modifier = Modifier.size(14.dp))
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(text = title, color = if (isActive) LuminaCyan else LuminaTextSecondary, fontSize = 6.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+fun AdBannerBox(label: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(LuminaSurface.copy(alpha = 0.4f))
+            .border(BorderStroke(1.dp, LuminaBorder.copy(alpha = 0.3f)), RoundedCornerShape(4.dp))
+            .padding(2.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "--- ADVERTISEMENT SLOT ---", color = LuminaTextMuted, fontSize = 4.5.sp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(20.dp)
+                .background(LuminaSurfaceVariant, RoundedCornerShape(2.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = "[ $label ]", color = LuminaPurple, fontSize = 6.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
