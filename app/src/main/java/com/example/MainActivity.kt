@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.example.ui.screens.FabricationScreen
 import com.example.ui.screens.ImageGenScreen
+import com.example.ui.screens.MovieMakerScreen
 import com.example.ui.screens.VideoGenScreen
 import com.example.ui.theme.LuminaTheme
 import com.example.ui.theme.LuminaBackground
@@ -22,25 +23,45 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = LuminaBackground
                 ) {
-                    // Simple Navigation State for Lumina AI Suite
+                    // Navigation and Coin State System
                     var currentScreen by remember { mutableStateOf("dashboard") }
-                    var userCoins by remember { mutableDoubleStateOf(100.0) }
+                    var userCoins by remember { mutableIntStateOf(100) } // Integer coins for credit system
+                    var hasUsedDailyFreeVideo by remember { mutableStateOf(false) } // Daily free 5-10 sec video status
 
                     when (currentScreen) {
                         "dashboard" -> {
-                            // You can replace this with your main Dashboard screen or Fabrication Hub
                             FabricationScreen(
                                 onBack = { finish() }
+                            )
+                        }
+                        "movie_maker" -> {
+                            MovieMakerScreen(
+                                movieProjects = emptyList(),
+                                isGenerating = false,
+                                progress = 0f,
+                                userCoins = userCoins,
+                                hasUsedDailyFreeVideo = hasUsedDailyFreeVideo,
+                                onBack = { currentScreen = "dashboard" },
+                                onBuildMovie = { script, duration, bgm, requiredCoins ->
+                                    if (requiredCoins == 0) {
+                                        // Used Daily Free Slot (5-10 Seconds)
+                                        hasUsedDailyFreeVideo = true
+                                    } else if (userCoins >= requiredCoins) {
+                                        // Deduct required coins
+                                        userCoins -= requiredCoins
+                                    }
+                                    // Movie generation process triggered here
+                                }
                             )
                         }
                         "image_gen" -> {
                             ImageGenScreen(
                                 imageList = emptyList(),
                                 isGenerating = false,
-                                userCoins = userCoins,
+                                userCoins = userCoins.toDouble(),
                                 onBack = { currentScreen = "dashboard" },
                                 onGenerate = { prompt, style, ratio ->
-                                    // Handle Generation logic
+                                    // Handle Image Generation logic
                                 }
                             )
                         }
@@ -49,7 +70,7 @@ class MainActivity : ComponentActivity() {
                                 videoList = emptyList(),
                                 isGenerating = false,
                                 progress = 0f,
-                                userCoins = userCoins,
+                                userCoins = userCoins.toDouble(),
                                 onBack = { currentScreen = "dashboard" },
                                 onGenerate = { prompt, style, ratio, duration, motion ->
                                     // Handle Video Generation logic
