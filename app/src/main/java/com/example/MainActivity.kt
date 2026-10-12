@@ -113,7 +113,9 @@ class MainActivity : ComponentActivity() {
                                 onSaveStatus = { /* Save status logic */ },
                                 onCloseChat = { /* Close chat logic */ },
                                 onToggleSpeaker = { /* Toggle speaker logic */ },
-                                onOpenChat = { /* Open chat logic */ }
+                                onOpenChat = { /* Open chat logic */ },
+                                onEndCall = { /* End call logic */ },
+                                onToggleMute = { /* Toggle mute logic */ }
                             )
                         }
                         else -> {
