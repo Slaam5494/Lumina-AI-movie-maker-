@@ -108,7 +108,16 @@ class MainActivity : ComponentActivity() {
                                 onAddFriend = { userCoins += 3 },
                                 onShareApp = { userCoins += 5 },
                                 onOpenWhatsApp = { /* WhatsApp open logic */ },
-                                onWatchAd = { userCoins += 10 }
+                                onWatchAd = { userCoins += 10 },
+                                onSendDirectMessage = { /* Direct message logic */ },
+                                onSaveStatus = { /* Save status logic */ },
+                                onCloseChat = { /* Close chat logic */ },
+                                onToggleSpeaker = { /* Toggle speaker logic */ },
+                                onOpenChat = { friend, isOnline -> /* Open chat logic */ },
+                                onEndCall = { /* End call logic */ },
+                                onToggleMute = { /* Toggle mute logic */ },
+                                onOpenStore = { /* Store open logic */ },
+                                onStartCall = { /* Start call logic */ }
                             )
                         }
                         else -> {
