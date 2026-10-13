@@ -101,27 +101,18 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
-                        "friends_hub" -> {
+                                                "friends_hub" -> {
                             FriendsHubScreen(
                                 coinBalance = userCoins,
                                 onBack = { currentScreen = "dashboard" },
                                 onAddFriend = { userCoins += 3 },
                                 onShareApp = { userCoins += 5 },
                                 onOpenWhatsApp = { /* WhatsApp open logic */ },
-                                onWatchAd = { userCoins += 10 }
+                                onWatchAd = { userCoins += 10 },
+                                onSendDirectMessage = { /* Direct message logic */ },
+                                onSaveStatus = { /* Save status logic */ }
                             )
                         }
-                        else -> {
-                            DashboardScreen(
-                                coinBalance = userCoins.toDouble(),
-                                onOpenStore = {},
-                                onModuleSelected = { currentScreen = "dashboard" },
-                                onWatchAd = {}
-                            )
-                        }
-                    }
-                }
-            }
-        }
+
     }
 }
