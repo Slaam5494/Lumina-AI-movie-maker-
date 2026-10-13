@@ -1,421 +1,125 @@
-package com.example.ui.screens
+package com.example.app
 
-import android.content.Context
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.CallEnd
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MicOff
-import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Videocam
-import androidx.compose.material.icons.filled.VolumeUp
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import com.example.R
-import com.example.data.model.DirectMessage
-import com.example.data.model.FriendItem
-import com.example.data.model.StatusItem
+import com.example.ui.screens.DashboardScreen
+import com.example.ui.screens.ImageGenScreen
+import com.example.ui.screens.MovieMakerScreen
+import com.example.ui.screens.VideoGenScreen
+import com.example.ui.screens.FriendsHubScreen
+import com.example.ui.theme.LuminaTheme
 import com.example.ui.theme.LuminaBackground
-import com.example.ui.theme.LuminaBorder
-import com.example.ui.theme.LuminaCardBg
-import com.example.ui.theme.LuminaCyan
-import com.example.ui.theme.LuminaGold
-import com.example.ui.theme.LuminaGreen
-import com.example.ui.theme.LuminaPurple
-import com.example.ui.theme.LuminaRed
-import com.example.ui.theme.LuminaSurface
-import com.example.ui.theme.LuminaTextMuted
-import com.example.ui.theme.LuminaTextPrimary
-import com.example.ui.theme.LuminaTextSecondary
+import com.example.data.model.ModuleType
 
-@Composable
-fun FriendsHubScreen(
-    friends: List<FriendItem> = emptyList(),
-    statuses: List<StatusItem> = emptyList(),
-    activeCallFriend: FriendItem? = null,
-    isVideoCall: Boolean = false,
-    callSeconds: Int = 0,
-    isMuted: Boolean = false,
-    isSpeakerOn: Boolean = false,
-    activeChatFriend: FriendItem? = null,
-    directMessages: List<DirectMessage> = emptyList(),
-    userCoins: Int = 100,
-    onBack: () -> Unit = {},
-    onOpenStore: () -> Unit = {},
-    onStartCall: (FriendItem, Boolean) -> Unit = { _, _ -> },
-    onEndCall: () -> Unit = {},
-    onToggleMute: () -> Unit = {},
-    onToggleSpeaker: () -> Unit = {},
-    onOpenChat: (FriendItem) -> Unit = {},
-    onCloseChat: () -> Unit = {},
-    onSendDirectMessage: (String) -> Unit = {},
-    onSaveStatus: (String) -> Unit = {},
-    onOpenWhatsApp: (Context, String) -> Unit = { _, _ -> },
-    onWatchAd: () -> Unit = {},
-    onAddFriend: (String) -> Unit = {},
-    onShareApp: () -> Unit = {},
-    modifier: Modifier = Modifier
-) {
-    val context = LocalContext.current
-    var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("CHATS", "STATUS SAVER", "VIP THEMES")
-
-    if (activeCallFriend != null) {
-        ActiveCallScreen(
-            friend = activeCallFriend,
-            isVideo = isVideoCall,
-            durationSeconds = callSeconds,
-            isMuted = isMuted,
-            isSpeakerOn = isSpeakerOn,
-            onToggleMute = onToggleMute,
-            onToggleSpeaker = onToggleSpeaker,
-            onEndCall = onEndCall
-        )
-        return
-    }
-
-    if (activeChatFriend != null) {
-        FriendChatOverlay(
-            friend = activeChatFriend,
-            messages = directMessages,
-            onClose = onCloseChat,
-            onSendMessage = onSendDirectMessage,
-            onStartCall = { isVid -> onStartCall(activeChatFriend, isVid) },
-            onOpenWhatsApp = { onOpenWhatsApp(context, activeChatFriend.phoneNumber) }
-        )
-        return
-    }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(LuminaBackground)
-            .padding(10.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(
-                    onClick = onBack,
-                    modifier = Modifier.testTag("back_button_friends")
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            LuminaTheme(darkTheme = true, dynamicColor = false) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = LuminaBackground
                 ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = LuminaGreen
-                    )
-                }
-                Spacer(modifier = Modifier.width(4.dp))
-                Column {
-                    Text(
-                        text = "FRIENDS HUB",
-                        color = LuminaGreen,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Black,
-                        letterSpacing = 1.sp
-                    )
-                    Text(
-                        text = "Add Friends (+3 Coins) • Share (+5 Coins)",
-                        color = LuminaTextMuted,
-                        fontSize = 8.sp
-                    )
-                }
-            }
+                    var currentScreen by remember { mutableStateOf("dashboard") }
+                    var userCoins by remember { mutableIntStateOf(100) }
+                    var hasUsedDailyFreeVideo by remember { mutableStateOf(false) }
+                    var remainingFreeImages by remember { mutableIntStateOf(3) }
 
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(LuminaGold.copy(alpha = 0.15f))
-                    .border(1.dp, LuminaGold, RoundedCornerShape(8.dp))
-                    .padding(horizontal = 6.dp, vertical = 3.dp)
-            ) {
-                Text(
-                    text = "$userCoins Coins",
-                    color = LuminaGold,
-                    fontSize = 8.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            tabs.forEachIndexed { index, title ->
-                val isSelected = selectedTab == index
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(if (isSelected) LuminaGreen else LuminaSurface)
-                        .border(1.dp, if (isSelected) LuminaGreen else LuminaBorder, RoundedCornerShape(6.dp))
-                        .clickable { selectedTab = index }
-                        .padding(vertical = 6.dp)
-                        .testTag("friends_tab_$index"),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = title,
-                        color = if (isSelected) Color.Black else Color.White,
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.Black
-                    )
-                }
-            }
-        }
-
-        when (selectedTab) {
-            0 -> ChatsTabContent(
-                friends = friends,
-                onOpenChat = onOpenChat,
-                onStartCall = onStartCall,
-                onOpenWhatsApp = { phone -> onOpenWhatsApp(context, phone) },
-                onOpenStore = onOpenStore,
-                onWatchAd = onWatchAd,
-                onAddFriend = onAddFriend,
-                onShareApp = onShareApp
-            )
-            1 -> StatusSaverTabContent(
-                statuses = statuses,
-                onSaveStatus = onSaveStatus,
-                onWatchAd = onWatchAd
-            )
-            2 -> VipThemesTabContent(
-                onOpenStore = onOpenStore
-            )
-        }
-    }
-}
-
-@Composable
-fun ChatsTabContent(
-    friends: List<FriendItem>,
-    onOpenChat: (FriendItem) -> Unit,
-    onStartCall: (FriendItem, Boolean) -> Unit,
-    onOpenWhatsApp: (String) -> Unit,
-    onOpenStore: () -> Unit,
-    onWatchAd: () -> Unit,
-    onAddFriend: (String) -> Unit,
-    onShareApp: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var searchQuery by remember { mutableStateOf("") }
-
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(LuminaSurface)
-                    .border(1.dp, LuminaGreen, RoundedCornerShape(8.dp))
-                    .padding(8.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Text(
-                    text = "ADD FRIEND (+3 COINS) OR SHARE APP (+5 COINS)",
-                    color = LuminaGreen,
-                    fontSize = 8.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(44.dp),
-                        placeholder = { Text("Enter Username / Phone", color = LuminaTextMuted, fontSize = 8.sp) },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = LuminaGreen,
-                            unfocusedBorderColor = LuminaBorder,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(6.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(LuminaGreen)
-                            .clickable(enabled = searchQuery.isNotBlank()) {
-                                onAddFriend(searchQuery)
-                                searchQuery = ""
-                            }
-                            .padding(horizontal = 10.dp, vertical = 10.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = Icons.Default.PersonAdd, contentDescription = null, tint = Color.Black, modifier = Modifier.size(12.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(text = "ADD", color = Color.Black, fontSize = 8.sp, fontWeight = FontWeight.Bold)
+                    when (currentScreen) {
+                        "dashboard" -> {
+                            DashboardScreen(
+                                coinBalance = userCoins.toDouble(),
+                                onOpenStore = { /* Store logic */ },
+                                onModuleSelected = { module ->
+                                    currentScreen = when (module) {
+                                        ModuleType.MOVIE_MAKER -> "movie_maker"
+                                        ModuleType.MEDIA_GEN -> "video_gen"
+                                        ModuleType.AI_CHAT -> "dashboard"
+                                        ModuleType.PROMPT_STUDIO -> "dashboard"
+                                        ModuleType.FRIENDS_HUB -> "friends_hub"
+                                        ModuleType.SETTINGS -> "dashboard"
+                                        ModuleType.DASHBOARD -> "dashboard"
+                                    }
+                                },
+                                onWatchAd = {
+                                    userCoins += 10
+                                }
+                            )
+                        }
+                        "movie_maker" -> {
+                            MovieMakerScreen(
+                                movieProjects = emptyList(),
+                                isGenerating = false,
+                                progress = 0f,
+                                userCoins = userCoins,
+                                hasUsedDailyFreeVideo = hasUsedDailyFreeVideo,
+                                onBack = { currentScreen = "dashboard" },
+                                onBuildMovie = { script, duration, bgm, requiredCoins ->
+                                    if (requiredCoins == 0) {
+                                        hasUsedDailyFreeVideo = true
+                                    } else if (userCoins >= requiredCoins) {
+                                        userCoins -= requiredCoins
+                                    }
+                                }
+                            )
+                        }
+                        "image_gen" -> {
+                            ImageGenScreen(
+                                imageList = emptyList(),
+                                isGenerating = false,
+                                userCoins = userCoins.toDouble(),
+                                remainingFreeImages = remainingFreeImages,
+                                onBack = { currentScreen = "dashboard" },
+                                onGenerate = { prompt, style, ratio, requiredCoins ->
+                                    if (requiredCoins == 0) {
+                                        if (remainingFreeImages > 0) {
+                                            remainingFreeImages--
+                                        }
+                                    } else if (userCoins >= requiredCoins) {
+                                        userCoins -= requiredCoins
+                                    }
+                                }
+                            )
+                        }
+                        "video_gen" -> {
+                            VideoGenScreen(
+                                videoList = emptyList(),
+                                isGenerating = false,
+                                progress = 0f,
+                                userCoins = userCoins.toDouble(),
+                                onBack = { currentScreen = "dashboard" },
+                                onGenerate = { prompt, style, ratio, duration, motion ->
+                                    // 5s free video logic
+                                },
+                                onRedirectToMovieMaker = { script ->
+                                    currentScreen = "movie_maker"
+                                }
+                            )
+                        }
+                        "friends_hub" -> {
+                            FriendsHubScreen(
+                                userCoins = userCoins,
+                                onBack = { currentScreen = "dashboard" },
+                                onAddFriend = { userCoins += 3 },
+                                onShareApp = { userCoins += 5 }
+                            )
+                        }
+                        else -> {
+                            DashboardScreen(
+                                coinBalance = userCoins.toDouble(),
+                                onOpenStore = {},
+                                onModuleSelected = { currentScreen = "dashboard" },
+                                onWatchAd = {}
+                            )
                         }
                     }
                 }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(LuminaCyan.copy(alpha = 0.2f))
-                        .border(1.dp, LuminaCyan, RoundedCornerShape(6.dp))
-                        .clickable { onShareApp() }
-                        .padding(vertical = 6.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Icons.Default.Share, contentDescription = null, tint = LuminaCyan, modifier = Modifier.size(12.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = "SHARE APP WITH FRIENDS (+5 COINS)", color = LuminaCyan, fontSize = 8.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
             }
-        }
-
-        items(friends) { friend ->
-            FriendListItem(
-                friend = friend,
-                onOpenChat = { onOpenChat(friend) },
-                onVoiceCall = { onStartCall(friend, false) },
-                onVideoCall = { onStartCall(friend, true) },
-                onWhatsApp = { onOpenWhatsApp(friend.phoneNumber) }
-            )
         }
     }
 }
-
-@Composable
-fun FriendListItem(
-    friend: FriendItem,
-    onOpenChat: () -> Unit,
-    onVoiceCall: () -> Unit,
-    onVideoCall: () -> Unit,
-    onWhatsApp: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(LuminaCardBg)
-            .border(1.dp, LuminaBorder, RoundedCornerShape(8.dp))
-            .clickable { onOpenChat() }
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(contentAlignment = Alignment.BottomEnd) {
-            AsyncImage(
-                model = friend.avatarUrl,
-                contentDescription = friend.name,
-                modifier = Modifier
-                    .size(34.dp)
-                    .clip(CircleShape)
-                    .border(1.5.dp, LuminaGreen, CircleShape),
-                contentScale = ContentScale.Crop
-            )
-            if (friend.isOnline) {
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(LuminaGreen)
-                        .border(1.dp, Color.Black, CircleShape)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = friend.name,
-                color = LuminaTextPrimary,
-                fontSize = 9.5.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = friend.status,
-                color = if (friend.isOnline) LuminaGreen else LuminaTextMuted,
-                fontSize = 7.5.sp
-            )
-            Text(
-                text = friend.lastMessage,
-                color = LuminaTextSecondary,
-                fontSize = 7.sp,
-                maxLines = 1
-            )
-        }
-
-        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            Box(
-                modifier = Modifier
-                    .size(24.dp)
-                    .clip(CircleShape)
-                    .background(LuminaSurface)
-                    .border(1.dp, LuminaCyan, CircleShape)
-                    .clickable { onVoiceCall() },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(imageVector = Icons.Default.Call, contentDescription = "Voice Call", tint = LuminaCyan, modifier = Modifier.size(12.dp))
