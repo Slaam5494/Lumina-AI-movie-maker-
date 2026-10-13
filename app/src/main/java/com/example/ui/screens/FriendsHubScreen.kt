@@ -219,7 +219,7 @@ fun FriendsHubScreen(
         }
 
         when (selectedTab) {
-            0 -> ChatsTabContent(
+            0 -> HubChatsTabContent(
                 friends = friends,
                 onOpenChat = onOpenChat,
                 onStartCall = onStartCall,
@@ -242,7 +242,7 @@ fun FriendsHubScreen(
 }
 
 @Composable
-fun ChatsTabContent(
+fun HubChatsTabContent(
     friends: List<FriendItem>,
     onOpenChat: (FriendItem) -> Unit,
     onStartCall: (FriendItem, Boolean) -> Unit,
