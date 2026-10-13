@@ -113,7 +113,7 @@ class MainActivity : ComponentActivity() {
                                 onSaveStatus = { /* Save status logic */ },
                                 onCloseChat = { /* Close chat logic */ },
                                 onToggleSpeaker = { /* Toggle speaker logic */ },
-                                onOpenChat = { friendItem, isOnline -> /* Correct parameters */ },
+                                onOpenChat = { friend: com.example.data.model.FriendItem, isOnline: Boolean -> /* Fixed type mismatch */ },
                                 onEndCall = { /* End call logic */ },
                                 onToggleMute = { /* Toggle mute logic */ },
                                 onOpenStore = { /* Store open logic */ },
