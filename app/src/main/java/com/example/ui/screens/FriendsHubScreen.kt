@@ -1,12 +1,10 @@
 package com.example.ui.screens
 
 import android.content.Context
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,15 +27,11 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.CallEnd
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Icon
@@ -55,7 +48,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -75,7 +67,6 @@ import com.example.ui.theme.LuminaCardBg
 import com.example.ui.theme.LuminaCyan
 import com.example.ui.theme.LuminaGold
 import com.example.ui.theme.LuminaGreen
-import com.example.ui.theme.LuminaPink
 import com.example.ui.theme.LuminaPurple
 import com.example.ui.theme.LuminaRed
 import com.example.ui.theme.LuminaSurface
@@ -198,7 +189,6 @@ fun FriendsHubScreen(
             }
         }
 
-        // Tabs
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -228,7 +218,6 @@ fun FriendsHubScreen(
             }
         }
 
-        // Tab Content
         when (selectedTab) {
             0 -> ChatsTabContent(
                 friends = friends,
@@ -270,7 +259,6 @@ fun ChatsTabContent(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Add Friend & Share App Banner (Reward System)
         item {
             Column(
                 modifier = Modifier
@@ -327,7 +315,6 @@ fun ChatsTabContent(
                     }
                 }
 
-                // Share Button for +5 Coins
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -347,7 +334,6 @@ fun ChatsTabContent(
             }
         }
 
-        // Friends List
         items(friends) { friend ->
             FriendListItem(
                 friend = friend,
