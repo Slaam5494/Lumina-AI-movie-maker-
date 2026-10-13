@@ -102,8 +102,22 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         "friends_hub" -> {
-    FriendsHubScreen(
-        userCoins = userCoins,
-        onBack = { currentScreen = "dashboard" }
-    )
+                            FriendsHubScreen(
+                                userCoins = userCoins,
+                                onBack = { currentScreen = "dashboard" }
+                            )
+                        }
+                        else -> {
+                            DashboardScreen(
+                                coinBalance = userCoins.toDouble(),
+                                onOpenStore = {},
+                                onModuleSelected = { currentScreen = "dashboard" },
+                                onWatchAd = {}
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
