@@ -335,7 +335,7 @@ fun ChatsTabContent(
         }
 
         items(friends) { friend ->
-            FriendListItem(
+            HubFriendItem(
                 friend = friend,
                 onOpenChat = { onOpenChat(friend) },
                 onVoiceCall = { onStartCall(friend, false) },
@@ -347,7 +347,7 @@ fun ChatsTabContent(
 }
 
 @Composable
-fun FriendListItem(
+fun HubFriendItem(
     friend: FriendItem,
     onOpenChat: () -> Unit,
     onVoiceCall: () -> Unit,
