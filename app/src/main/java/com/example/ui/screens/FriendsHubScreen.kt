@@ -111,55 +111,7 @@ fun FriendsHubScreen(
     onShareApp: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("CHATS", "STATUS SAVER", "VIP THEMES")
 
-    if (activeCallFriend != null) {
-        ActiveCallScreen(
-            friend = activeCallFriend,
-            isVideo = isVideoCall,
-            durationSeconds = callSeconds,
-            isMuted = isMuted,
-            isSpeakerOn = isSpeakerOn,
-            onToggleMute = onToggleMute,
-            onToggleSpeaker = onToggleSpeaker,
-            onEndCall = onEndCall
-        )
-        return
-    }
-
-    if (activeChatFriend != null) {
-        FriendChatOverlay(
-            friend = activeChatFriend,
-            messages = directMessages,
-            onClose = onCloseChat,
-            onSendMessage = onSendDirectMessage,
-            onStartCall = { isVid -> onStartCall(activeChatFriend, isVid) },
-            onOpenWhatsApp = { onOpenWhatsApp(context, activeChatFriend.phoneNumber) }
-        )
-        return
-    }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(LuminaBackground)
-            .padding(10.dp)
-    ) {
-        // Screen Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(
-                    onClick = onBack,
-                    modifier = Modifier.testTag("back_button_friends")
-                ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
