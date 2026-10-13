@@ -102,24 +102,8 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         "friends_hub" -> {
-                            FriendsHubScreen(
-                                userCoins = userCoins,
-                                onBack = { currentScreen = "dashboard" },
-                                onAddFriend = { userCoins += 3 },
-                                onShareApp = { userCoins += 5 }
-                            )
-                        }
-                        else -> {
-                            DashboardScreen(
-                                coinBalance = userCoins.toDouble(),
-                                onOpenStore = {},
-                                onModuleSelected = { currentScreen = "dashboard" },
-                                onWatchAd = {}
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
+    FriendsHubScreen(
+        userCoins = userCoins,
+        onBack = { currentScreen = "dashboard" }
+    )
 }
