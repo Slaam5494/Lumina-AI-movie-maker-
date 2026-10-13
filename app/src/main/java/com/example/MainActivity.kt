@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import com.example.ui.screens.LoginScreen
 import com.example.ui.screens.DashboardScreen
 import com.example.ui.screens.ImageGenScreen
 import com.example.ui.screens.MovieMakerScreen
@@ -25,12 +26,23 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = LuminaBackground
                 ) {
-                    var currentScreen by remember { mutableStateOf("dashboard") }
+                    // شروعاتی اسکرین کو "login" سیٹ کیا گیا ہے
+                    var currentScreen by remember { mutableStateOf("login") }
                     var userCoins by remember { mutableIntStateOf(100) }
                     var hasUsedDailyFreeVideo by remember { mutableStateOf(false) }
                     var remainingFreeImages by remember { mutableIntStateOf(3) }
 
                     when (currentScreen) {
+                        "login" -> {
+                            LoginScreen(
+                                onLoginWithGoogle = {
+                                    currentScreen = "dashboard"
+                                },
+                                onContinueAsGuest = {
+                                    currentScreen = "dashboard"
+                                }
+                            )
+                        }
                         "dashboard" -> {
                             DashboardScreen(
                                 coinBalance = userCoins.toDouble(),
@@ -108,11 +120,9 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         else -> {
-                            DashboardScreen(
-                                coinBalance = userCoins.toDouble(),
-                                onOpenStore = {},
-                                onModuleSelected = { currentScreen = "dashboard" },
-                                onWatchAd = {}
+                            LoginScreen(
+                                onLoginWithGoogle = { currentScreen = "dashboard" },
+                                onContinueAsGuest = { currentScreen = "dashboard" }
                             )
                         }
                     }
